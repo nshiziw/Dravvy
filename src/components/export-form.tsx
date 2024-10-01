@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { saveAs } from 'file-saver'
 import { Document, Packer, Paragraph } from 'docx'
-import { PDFDownloadLink } from '@react-pdf/renderer'
+import { pdf } from '@react-pdf/renderer'
 import { ResumePDF } from './resume-pdf'
 import { FileIcon, FileTextIcon } from 'lucide-react'
 
@@ -22,6 +22,7 @@ const formatDate = (dateString: string) => {
 export function ExportForm() {
   const hydrated = useHydration()
   const [format, setFormat] = useState<'pdf' | 'docx'>('pdf')
+  const [loading, setLoading] = useState(false)
   const resume = useResumeStore((state) => state.resume)
   const styling = useResumeStore((state) => state.styling)
 
@@ -31,6 +32,7 @@ export function ExportForm() {
 
   const handleWordExport = async () => {
     try {
+      setLoading(true)
       const doc = new Document({
         sections: [
           {
@@ -191,11 +193,13 @@ export function ExportForm() {
       })
 
       const blob = await Packer.toBlob(doc)
-      saveAs(blob, 'resume.docx')
-      toast.success('Word document exported successfully!')
+      saveAs(blob, `${resume.contact.name.toLowerCase().replace(/\s+/g, '-')}-resume.docx`)
+      toast.success('Word document downloaded successfully!')
     } catch (error) {
-      console.error('Error exporting Word document:', error)
-      toast.error('Failed to export Word document')
+      console.error('Error generating Word document:', error)
+      toast.error('Error generating Word document')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -237,23 +241,28 @@ export function ExportForm() {
       </RadioGroup>
 
       {format === 'pdf' ? (
-        <PDFDownloadLink
-          document={<ResumePDF />}
-          fileName="resume.pdf"
+        <Button
           className="w-full"
+          onClick={async () => {
+            try {
+              const blob = await pdf(<ResumePDF />).toBlob()
+              saveAs(blob, `${resume.contact.name.toLowerCase().replace(/\s+/g, '-')}-resume.pdf`)
+              toast.success('PDF downloaded successfully!')
+            } catch (error) {
+              console.error('Error generating PDF:', error)
+              toast.error('Error generating PDF')
+            }
+          }}
         >
-          {({ loading }) => (
-            <Button className="w-full" disabled={loading}>
-              {loading ? 'Generating PDF...' : 'Download PDF'}
-            </Button>
-          )}
-        </PDFDownloadLink>
+          Download PDF
+        </Button>
       ) : (
         <Button
           className="w-full"
           onClick={handleWordExport}
+          disabled={loading}
         >
-          Download Word
+          {loading ? 'Generating Word...' : 'Download Word'}
         </Button>
       )}
     </div>
