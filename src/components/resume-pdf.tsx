@@ -2,6 +2,7 @@
 
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import { useResumeStore } from '@/store/useResumeStore'
+import { Resume } from '@/store/useResumeStore'; // Use existing types
 
 const styles = StyleSheet.create({
   page: {
@@ -103,90 +104,19 @@ const styles = StyleSheet.create({
   }
 })
 
-
-
-interface Experience {
-  jobTitle: string
-  company: string
-  location: string
-}
-
-interface Contact {
-  name: string
-  email: string
-  phone: string
-  location: string
-}
-
-interface Resume {
-  contact: Contact
-  summary?: string
-  experience: Experience[]
-  education: Education[]
-  skills: Skill[]
-  projects: Project[]
-}
-
-interface Experience {
-  jobTitle: string
-  company: string
-  location: string
-  startDate: string
-  endDate?: string
-  isPresent?: boolean
-  description: string[]
-}
-
-interface Education {
-  degree: string
-  institution: string
-  location: string
-  startDate: string
-  endDate?: string
-  expectedDate?: string
-  isExpected?: boolean
-}
-
-interface Skill {
-  name: string
-  proficiency?: number
-}
-
-interface Project {
-  name: string
-  description: string
-  technologies: string[]
-  githubLink?: string
-  demoLink?: string
-}
-
-interface Contact {
-  name: string
-  email: string
-  phone: string
-  location: string
-}
-
-interface Resume {
-  contact: Contact
-  summary?: string
-  experience: Experience[]
-  education: Education[]
-  skills: Skill[]
-  projects: Project[]
-}
-
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    month: 'short',
-    year: 'numeric'
-  })
-}
+  try {
+    return new Date(date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  } catch (error) {
+    console.error('Invalid date format:', error);
+    return date;
+  }
+};
 
 export function ResumePDF() {
   try {
-    const resume = useResumeStore.getState().resume as Resume
-    const styling = useResumeStore.getState().styling
+    const resume = useResumeStore.getState().resume;
+    const styling = useResumeStore.getState().styling;
 
     return (
       <Document>
@@ -299,9 +229,9 @@ export function ResumePDF() {
           )}
         </Page>
       </Document>
-    )
+    );
   } catch (error) {
-    console.error('Error in ResumePDF:', error)
-    return null
+    console.error('Error generating PDF:', error);
+    return null;
   }
 }

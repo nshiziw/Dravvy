@@ -1,5 +1,5 @@
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 type Contact = {
   name: string;
@@ -10,7 +10,7 @@ type Contact = {
   website?: string;
   linkedin?: string;
   github?: string;
-}
+};
 
 type Experience = {
   jobTitle: string;
@@ -20,7 +20,7 @@ type Experience = {
   endDate: string;
   isPresent: boolean;
   description: string[];
-}
+};
 
 type Education = {
   degree: string;
@@ -30,52 +30,7 @@ type Education = {
   endDate: string;
   expectedDate: string;
   isExpected: boolean;
-}
-
-type Skill = {
-  name: string;
-  proficiency?: number;
-}
-
-type Certification = {
-  title: string;
-  issuer: string;
-  issueDate: string;
-}
-
-export type Award = {
-  title: string;
-  institution: string;
-  date: string;
-}
-
-type Language = {
-  name: string;
-  proficiency: 'Beginner' | 'Intermediate' | 'Advanced' | 'Native';
-}
-
-type Project = {
-  name: string;
-  description: string;
-  technologies: string[];
-  githubLink?: string;
-  demoLink?: string;
-}
-
-type Volunteer = {
-  role: string;
-  organization: string;
-  date: string;
-  description: string;
-}
-
-type Reference = {
-  name: string;
-  relationship: string;
-  company: string;
-  email: string;
-  phone: string;
-}
+};
 
 type Styling = {
   showSkillProficiency: boolean;
@@ -86,45 +41,32 @@ type Styling = {
     color: string;
   };
   showLinks: boolean;
-}
+};
 
 export type Resume = {
   contact: Contact;
   summary: string;
   experience: Experience[];
   education: Education[];
-  skills: Skill[];
-  certifications: Certification[];
-  awards: Award[];
-  languages: Language[];
+  skills: { name: string; proficiency?: number }[];
+  certifications: { title: string; issuer: string; issueDate: string }[];
+  awards: { title: string; institution: string; date: string }[];
+  languages: { name: string; proficiency: string }[];
   hobbies: string[];
-  projects: Project[];
-  volunteer: Volunteer[];
-  references: Reference[];
-}
+  projects: { name: string; description: string; technologies: string[] }[];
+  volunteer: { role: string; organization: string; date: string; description: string }[];
+  references: { name: string; relationship: string; company: string; email: string; phone: string }[];
+};
 
 type ResumeStore = {
-  resume: Resume
-  activeSection: number
-  styling: Styling
-  updateContact: (contact: Contact) => void
-  updateSummary: (summary: string) => void
-  updateExperience: (experience: Experience[]) => void
-  updateEducation: (education: Education[]) => void
-  updateSkills: (skills: Array<{
-    name: string;
-    proficiency?: number;
-  }>) => void
-  updateCertifications: (certifications: Certification[]) => void
-  updateAwards: (awards: Award[]) => void
-  updateLanguages: (languages: Language[]) => void
-  updateHobbies: (hobbies: string[]) => void
-  updateProjects: (projects: Project[]) => void
-  updateVolunteer: (volunteer: Volunteer[]) => void
-  updateReferences: (references: Reference[]) => void
-  setActiveSection: (section: number) => void
-  updateStyling: (styling: Partial<Styling>) => void
-}
+  resume: Resume;
+  activeSection: number;
+  styling: Styling;
+  updateContact: (contact: Contact) => void;
+  updateExperience: (experience: Experience[]) => void;
+  updateEducation: (education: Education[]) => void;
+  setActiveSection: (section: number) => void;
+};
 
 const initialStyling: Styling = {
   showSkillProficiency: true,
@@ -135,7 +77,7 @@ const initialStyling: Styling = {
     color: '#000000',
   },
   showLinks: true,
-}
+};
 
 const initialResume: Resume = {
   contact: {
@@ -144,6 +86,9 @@ const initialResume: Resume = {
     email: '',
     phone: '',
     location: '',
+    website: '',
+    linkedin: '',
+    github: '',
   },
   summary: '',
   experience: [],
@@ -156,15 +101,35 @@ const initialResume: Resume = {
   projects: [],
   volunteer: [],
   references: [],
-}
+};
 
-const storage = typeof window !== 'undefined' 
+const storage = typeof window !== 'undefined'
   ? createJSONStorage(() => localStorage)
   : createJSONStorage(() => ({
       getItem: () => null,
-      setItem: () => {},
-      removeItem: () => {},
-    }))
+      setItem: () => {
+        console.warn('Storage is not available in this environment.');
+      },
+      removeItem: () => {
+        console.warn('Storage is not available in this environment.');
+      },
+    }));
+
+const validateContact = (contact: Contact) => {
+  if (!contact.name || !contact.email || !contact.phone) {
+    console.error('Invalid contact information');
+    return false;
+  }
+  return true;
+};
+
+const validateExperience = (experience: Experience[]) => {
+  return experience.every((exp) => exp.jobTitle && exp.company && exp.startDate);
+};
+
+const validateEducation = (education: Education[]) => {
+  return education.every((edu) => edu.degree && edu.institution && edu.startDate);
+};
 
 export const useResumeStore = create<ResumeStore>()(
   persist(
@@ -172,20 +137,39 @@ export const useResumeStore = create<ResumeStore>()(
       resume: initialResume,
       activeSection: 0,
       styling: initialStyling,
-      updateContact: (contact) => set((state) => ({ resume: { ...state.resume, contact } })),
-      updateSummary: (summary) => set((state) => ({ resume: { ...state.resume, summary } })),
-      updateExperience: (experience) => set((state) => ({ resume: { ...state.resume, experience } })),
-      updateEducation: (education) => set((state) => ({ resume: { ...state.resume, education } })),
-      updateSkills: (skills) => set((state) => ({ resume: { ...state.resume, skills } })),
-      updateCertifications: (certifications) => set((state) => ({ resume: { ...state.resume, certifications } })),
-      updateAwards: (awards) => set((state) => ({ resume: { ...state.resume, awards } })),
-      updateLanguages: (languages) => set((state) => ({ resume: { ...state.resume, languages } })),
-      updateHobbies: (hobbies) => set((state) => ({ resume: { ...state.resume, hobbies } })),
-      updateProjects: (projects) => set((state) => ({ resume: { ...state.resume, projects } })),
-      updateVolunteer: (volunteer) => set((state) => ({ resume: { ...state.resume, volunteer } })),
-      updateReferences: (references) => set((state) => ({ resume: { ...state.resume, references } })),
-      setActiveSection: (section) => set({ activeSection: section }),
-      updateStyling: (styling) => set((state) => ({ styling: { ...state.styling, ...styling } })),
+      updateContact: (contact: Contact) => {
+        try {
+          if (!validateContact(contact)) return;
+          set((state) => ({ resume: { ...state.resume, contact } }));
+        } catch (error) {
+          console.error('Failed to update contact:', error);
+        }
+      },
+      updateExperience: (experience: Experience[]) => {
+        try {
+          if (!validateExperience(experience)) {
+            console.error('Invalid experience data');
+            return;
+          }
+          set((state) => ({ resume: { ...state.resume, experience } }));
+        } catch (error) {
+          console.error('Failed to update experience:', error);
+        }
+      },
+      updateEducation: (education: Education[]) => {
+        try {
+          if (!validateEducation(education)) {
+            console.error('Invalid education data');
+            return;
+          }
+          set((state) => ({ resume: { ...state.resume, education } }));
+        } catch (error) {
+          console.error('Failed to update education:', error);
+        }
+      },
+      setActiveSection: (section: number) => {
+        set(() => ({ activeSection: section }));
+      },
     }),
     {
       name: 'resume-storage',
@@ -193,4 +177,4 @@ export const useResumeStore = create<ResumeStore>()(
       skipHydration: true,
     }
   )
-) 
+);

@@ -29,29 +29,37 @@ export function ProgressTracker() {
   const setActiveSection = useResumeStore((state) => state.setActiveSection)
 
   const handleStepClick = (index: number) => {
-    setActiveSection(index)
+    try {
+      setActiveSection(index);
+    } catch (error) {
+      console.error('Failed to set active section:', error);
+    }
   }
 
   const isSectionCompleted = (sectionId: string) => {
     switch (sectionId) {
       case 'contact':
-        return !!resume.contact?.name
+        return !!resume.contact?.name;
       case 'summary':
-        return !!resume.summary
+        return !!resume.summary;
       case 'experience':
-        return (resume.experience?.length || 0) > 0
+        return (resume.experience?.length || 0) > 0;
       case 'education':
-        return (resume.education?.length || 0) > 0
+        return (resume.education?.length || 0) > 0;
       case 'skills':
-        return (resume.skills?.length || 0) > 0
+        return (resume.skills?.length || 0) > 0;
       case 'projects':
-        return (resume.projects?.length || 0) > 0
+        return (resume.projects?.length || 0) > 0;
       case 'certifications':
-        return (resume.certifications?.length || 0) > 0
+        return (resume.certifications?.length || 0) > 0;
       case 'awards':
-        return (resume.awards?.length || 0) > 0
+        return (resume.awards?.length || 0) > 0;
+      case 'styling':
+      case 'preview':
+      case 'export':
+        return true; // Mark these as always completed
       default:
-        return false
+        return false;
     }
   }
 
@@ -117,4 +125,4 @@ export function ProgressTracker() {
       </div>
     </div>
   )
-} 
+}

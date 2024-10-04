@@ -60,6 +60,18 @@ export function StylingForm() {
     setTimeout(() => setSubmitSuccess(false), 3000);
   };
 
+  const handleStylingUpdate = (update: Partial<Styling>) => {
+    if (update.fontFamily && ![...serifFonts, ...sansSerifFonts].some(font => font.value === update.fontFamily)) {
+      console.error('Invalid font family selected');
+      return;
+    }
+    if (update.dateFormat && !dateFormats.some(format => format.value === update.dateFormat)) {
+      console.error('Invalid date format selected');
+      return;
+    }
+    updateStyling(update);
+  };
+
   return (
     <div className="space-y-6">
       <div className="space-y-4">

@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { resumeSchema } from '@/lib/validations/resume'
-import { useResumeStore, type Resume } from '@/store/useResumeStore'
+import { useResumeStore, type Resume, type Contact } from '@/store/useResumeStore';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -313,17 +313,27 @@ export function ResumeForm({ section }: ResumeFormProps) {
     defaultValues: resume,
   })
 
+  const validateContact = (contact: Contact) => {
+    if (!contact.name || !contact.email || !contact.phone) {
+      console.error('Invalid contact information');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const formData = form.getValues();
-    console.log('Form submitted:', formData);
-    
-    if (section === 'contact') {
-      updateContact(formData.contact);
-    } else if (section === 'summary') {
-      updateSummary(formData.summary);
+
+    if (section === 'contact' && !validateContact(formData.contact)) {
+      setError('Please fill out all required fields');
+      return;
     }
-    
+
+    // Update store
+    if (section === 'contact') updateContact(formData.contact);
+    else if (section === 'summary') updateSummary(formData.summary);
+
     setIsSubmitting(false);
     setSubmitSuccess(true);
     setTimeout(() => setSubmitSuccess(false), 3000);
@@ -1184,4 +1194,4 @@ export function ResumeForm({ section }: ResumeFormProps) {
   }
 
   return null
-} 
+}
