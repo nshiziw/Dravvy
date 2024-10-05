@@ -1,8 +1,7 @@
 'use client'
 
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
-import { useResumeStore } from '@/store/useResumeStore'
-import { Resume } from '@/store/useResumeStore'; // Use existing types
+import { useResumeStore } from '@/store/useResumeStore';
+import { StyleSheet, Document, Page, View, Text } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
   page: {

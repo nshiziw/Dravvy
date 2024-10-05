@@ -1,32 +1,22 @@
-'use client'
+import { useResumeStore } from '@/store/useResumeStore';
 
-import { useResumeStore } from '@/store/useResumeStore'
+const formatDate = (dateString: string) => {
+  try {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      year: 'numeric',
+    });
+  } catch (error) {
+    console.error('Invalid date format:', error);
+    return dateString;
+  }
+};
 
 export function ResumePreview() {
   const resume = useResumeStore((state) => state.resume)
   const styling = useResumeStore((state) => state.styling)
-
-  const formatDate = (dateString: string) => {
-    try {
-      if (!dateString) return '';
-      const date = new Date(dateString);
-      switch (styling.dateFormat) {
-        case 'MM/DD/YYYY':
-          return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
-        case 'DD/MM/YYYY':
-          return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        case 'Month DD, YYYY':
-          return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-        case 'DD Month YYYY':
-          return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-        default:
-          return dateString;
-      }
-    } catch (error) {
-      console.error('Invalid date format:', error);
-      return dateString;
-    }
-  };
 
   const renderDivider = () => {
     switch (styling.sectionDivider.type) {

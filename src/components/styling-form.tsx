@@ -1,6 +1,6 @@
 "use client";
 
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeStore, Styling } from "@/store/useResumeStore";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";

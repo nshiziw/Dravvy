@@ -53,7 +53,13 @@ export type Resume = {
   awards: { title: string; institution: string; date: string }[];
   languages: { name: string; proficiency: string }[];
   hobbies: string[];
-  projects: { name: string; description: string; technologies: string[] }[];
+  projects: {
+    name: string;
+    description: string;
+    technologies: string[];
+    githubLink?: string;
+    demoLink?: string;
+  }[];
   volunteer: { role: string; organization: string; date: string; description: string }[];
   references: { name: string; relationship: string; company: string; email: string; phone: string }[];
 };
@@ -66,6 +72,12 @@ type ResumeStore = {
   updateExperience: (experience: Experience[]) => void;
   updateEducation: (education: Education[]) => void;
   setActiveSection: (section: number) => void;
+  updateStyling: (styling: Partial<Styling>) => void;
+  updateSummary: (summary: string) => void;
+  updateSkills: (skills: { name: string; proficiency?: number }[]) => void;
+  updateProjects: (projects: { name: string; description: string; technologies: string[]; githubLink?: string; demoLink?: string }[]) => void;
+  updateCertifications: (certifications: { title: string; issuer: string; issueDate: string }[]) => void;
+  updateAwards: (awards: { title: string; institution: string; date: string }[]) => void;
 };
 
 const initialStyling: Styling = {
@@ -170,6 +182,24 @@ export const useResumeStore = create<ResumeStore>()(
       setActiveSection: (section: number) => {
         set(() => ({ activeSection: section }));
       },
+      updateStyling: (styling: Partial<Styling>) => {
+        set((state) => ({ styling: { ...state.styling, ...styling } }));
+      },
+      updateSummary: (summary: string) => {
+        set((state) => ({ resume: { ...state.resume, summary } }));
+      },
+      updateSkills: (skills: { name: string; proficiency?: number }[]) => {
+        set((state) => ({ resume: { ...state.resume, skills } }));
+      },
+      updateProjects: (projects: { name: string; description: string; technologies: string[]; githubLink?: string; demoLink?: string }[]) => {
+        set((state) => ({ resume: { ...state.resume, projects } }));
+      },
+      updateCertifications: (certifications: { title: string; issuer: string; issueDate: string }[]) => {
+        set((state) => ({ resume: { ...state.resume, certifications } }));
+      },
+      updateAwards: (awards: { title: string; institution: string; date: string }[]) => {
+        set((state) => ({ resume: { ...state.resume, awards } }));
+      },
     }),
     {
       name: 'resume-storage',
@@ -178,3 +208,5 @@ export const useResumeStore = create<ResumeStore>()(
     }
   )
 );
+
+export type { Styling, Contact };
