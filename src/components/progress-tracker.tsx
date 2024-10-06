@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress'
 import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
+import type { ResumeData } from '@/types/resume'
 
 const sections = [
   { id: 'contact', label: 'Contact Information' },
@@ -22,11 +23,30 @@ const sections = [
 ]
 
 export function ProgressTracker() {
-  const resume = useResumeStore((state) => state.resume)
-  const progress = calculateProgress(resume)
+  const contact = useResumeStore((state: { contact: ResumeData['contact'] }) => state.contact)
+  const summary = useResumeStore((state: { summary: ResumeData['summary'] }) => state.summary)
+  const experience = useResumeStore((state: { experience: ResumeData['experience'] }) => state.experience)
+  const education = useResumeStore((state: { education: ResumeData['education'] }) => state.education)
+  const skills = useResumeStore((state: { skills: ResumeData['skills'] }) => state.skills)
+  const projects = useResumeStore((state: { projects: ResumeData['projects'] }) => state.projects)
+  const certifications = useResumeStore((state: { certifications: ResumeData['certifications'] }) => state.certifications)
+  const awards = useResumeStore((state: { awards: ResumeData['awards'] }) => state.awards)
+  const activeSection = useResumeStore((state: { activeSection: number }) => state.activeSection)
+  const setActiveSection = useResumeStore((state: { setActiveSection: (section: number) => void }) => state.setActiveSection)
+
+  const resumeData = {
+    contact,
+    summary,
+    experience,
+    education,
+    skills,
+    projects,
+    certifications,
+    awards
+  }
+
+  const progress = calculateProgress(resumeData)
   const message = getProgressMessage(progress)
-  const activeSection = useResumeStore((state) => state.activeSection)
-  const setActiveSection = useResumeStore((state) => state.setActiveSection)
 
   const handleStepClick = (index: number) => {
     try {
@@ -39,21 +59,21 @@ export function ProgressTracker() {
   const isSectionCompleted = (sectionId: string) => {
     switch (sectionId) {
       case 'contact':
-        return !!resume.contact?.name;
+        return !!contact?.name;
       case 'summary':
-        return !!resume.summary;
+        return !!summary;
       case 'experience':
-        return (resume.experience?.length || 0) > 0;
+        return (experience?.length || 0) > 0;
       case 'education':
-        return (resume.education?.length || 0) > 0;
+        return (education?.length || 0) > 0;
       case 'skills':
-        return (resume.skills?.length || 0) > 0;
+        return (skills?.length || 0) > 0;
       case 'projects':
-        return (resume.projects?.length || 0) > 0;
+        return (projects?.length || 0) > 0;
       case 'certifications':
-        return (resume.certifications?.length || 0) > 0;
+        return (certifications?.length || 0) > 0;
       case 'awards':
-        return (resume.awards?.length || 0) > 0;
+        return (awards?.length || 0) > 0;
       case 'styling':
       case 'preview':
       case 'export':
@@ -70,7 +90,7 @@ export function ProgressTracker() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="p-6 bg-white rounded-lg shadow">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">Resume Progress</h2>
@@ -79,7 +99,7 @@ export function ProgressTracker() {
         <Progress value={progress} className="h-2" />
         <div className="relative">
           <div className="absolute top-4 left-0 right-0 h-0.5 bg-gray-200" />
-          <div className="flex justify-between relative">
+          <div className="relative flex justify-between">
             {sections.map((section, index) => {
               const status = getStepStatus(index)
               return (
@@ -98,7 +118,7 @@ export function ProgressTracker() {
                     status === 'pending' && "bg-gray-200 group-hover:bg-gray-300"
                   )}>
                     {status === 'completed' ? (
-                      <Check className="h-4 w-4 text-white" />
+                      <Check className="w-4 h-4 text-white" />
                     ) : (
                       <span className={cn(
                         "text-sm font-medium",

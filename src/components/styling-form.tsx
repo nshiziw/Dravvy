@@ -1,25 +1,27 @@
 "use client";
 
-import { useResumeStore, Styling } from "@/store/useResumeStore";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import * as React from 'react'
+import type { JSX } from 'react'
+import { useResumeStore } from "@/store/useResumeStore"
+import type { ResumeData } from '@/types/resume'
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
+} from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
 
 const serifFonts = [
   { name: "Times New Roman", value: "Times New Roman" },
   { name: "Georgia", value: "Georgia" },
   { name: "Cambria", value: "Cambria" },
   { name: "Garamond", value: "Garamond" },
-];
+] as const
 
 const sansSerifFonts = [
   { name: "Calibri", value: "Calibri" },
@@ -28,257 +30,119 @@ const sansSerifFonts = [
   { name: "Roboto", value: "Roboto" },
   { name: "Lato", value: "Lato" },
   { name: "Open Sans", value: "Open Sans" },
-];
+] as const
 
 const dateFormats = [
   { label: "MM/DD/YYYY", value: "MM/DD/YYYY" },
   { label: "DD/MM/YYYY", value: "DD/MM/YYYY" },
   { label: "Month DD, YYYY", value: "Month DD, YYYY" },
   { label: "DD Month YYYY", value: "DD Month YYYY" },
-];
+] as const
 
 const dividerTypes = [
   { label: "None", value: "none" },
   { label: "Line", value: "line" },
   { label: "Double Line", value: "double-line" },
   { label: "Dashes", value: "dashes" },
-];
+] as const
 
-export function StylingForm() {
-  const { styling, updateStyling } = useResumeStore();
-  const [previewText, setPreviewText] = useState(
+export function StylingForm(): JSX.Element {
+  const [previewText, setPreviewText] = React.useState(
     "The quick brown fox jumps over the lazy dog"
-  );
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+  )
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [submitSuccess, setSubmitSuccess] = React.useState(false)
+
+  const style = useResumeStore((state: { style: ResumeData['style'] }) => state.style)
+  const updateStyle = useResumeStore((state: { updateStyle: (style: ResumeData['style']) => void }) => state.updateStyle)
 
   const handleSaveStyles = () => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     // The styles are already being saved in real-time, but we'll add a success message
-    setSubmitSuccess(true);
-    setIsSubmitting(false);
-    setTimeout(() => setSubmitSuccess(false), 3000);
-  };
+    setSubmitSuccess(true)
+    setIsSubmitting(false)
+    setTimeout(() => setSubmitSuccess(false), 3000)
+  }
 
-  const handleStylingUpdate = (update: Partial<Styling>) => {
-    if (update.fontFamily && ![...serifFonts, ...sansSerifFonts].some(font => font.value === update.fontFamily)) {
-      console.error('Invalid font family selected');
-      return;
+  const handleStyleUpdate = (update: Partial<ResumeData['style']>) => {
+    if (update.theme && !['modern', 'classic', 'minimal'].includes(update.theme)) {
+      console.error('Invalid theme selected')
+      return
     }
-    if (update.dateFormat && !dateFormats.some(format => format.value === update.dateFormat)) {
-      console.error('Invalid date format selected');
-      return;
-    }
-    updateStyling(update);
-  };
+    updateStyle({ ...style, ...update })
+  }
 
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        {/* Skill Proficiency Toggle */}
-        <div className="flex items-center justify-between">
-          <Label htmlFor="show-proficiency">Show Skill Proficiency</Label>
-          <Switch
-            id="show-proficiency"
-            checked={styling.showSkillProficiency}
-            onCheckedChange={(checked) =>
-              updateStyling({ showSkillProficiency: checked })
-            }
-          />
-        </div>
-
-        {/* Show Links Toggle */}
-        <div className="flex items-center justify-between">
-          <Label htmlFor="show-links">Show Links</Label>
-          <Switch
-            id="show-links"
-            checked={styling.showLinks}
-            onCheckedChange={(checked) =>
-              updateStyling({ showLinks: checked })
-            }
-          />
-        </div>
-
-        {/* Font Selection */}
+        {/* Theme Selection */}
         <div className="space-y-2">
-          <Label>Font Family</Label>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label className="text-sm text-gray-500">Serif Fonts</Label>
-              <Select
-                value={styling.fontFamily}
-                onValueChange={(value) => updateStyling({ fontFamily: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a serif font" />
-                </SelectTrigger>
-                <SelectContent>
-                  {serifFonts.map((font) => (
-                    <SelectItem key={font.value} value={font.value}>
-                      {font.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-sm text-gray-500">Sans-Serif Fonts</Label>
-              <Select
-                value={styling.fontFamily}
-                onValueChange={(value) => updateStyling({ fontFamily: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a sans-serif font" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sansSerifFonts.map((font) => (
-                    <SelectItem key={font.value} value={font.value}>
-                      {font.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          {/* Font Preview */}
-          <div className="mt-4 p-4 border rounded-lg">
-            <Label className="text-sm text-gray-500 mb-2">Preview</Label>
-            <div className="text-lg" style={{ fontFamily: styling.fontFamily }}>
-              {previewText}
-            </div>
-            <Input
-              type="text"
-              value={previewText}
-              onChange={(e) => setPreviewText(e.target.value)}
-              className="mt-2"
-              placeholder="Type to preview the font"
-            />
-          </div>
-        </div>
-
-        {/* Date Format */}
-        <div className="space-y-2">
-          <Label>Date Format</Label>
+          <Label>Theme</Label>
           <Select
-            value={styling.dateFormat}
-            onValueChange={(value) =>
-              updateStyling({ dateFormat: value as any })
-            }
+            value={style.theme}
+            onValueChange={(value: ResumeData['style']['theme']) => handleStyleUpdate({ theme: value })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select date format" />
+              <SelectValue placeholder="Select a theme" />
             </SelectTrigger>
             <SelectContent>
-              {dateFormats.map((format) => (
-                <SelectItem key={format.value} value={format.value}>
-                  {format.label}
-                </SelectItem>
-              ))}
+              <SelectItem value="modern">Modern</SelectItem>
+              <SelectItem value="classic">Classic</SelectItem>
+              <SelectItem value="minimal">Minimal</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        {/* Section Divider */}
+        {/* Font Size */}
         <div className="space-y-2">
-          <Label>Section Divider</Label>
-          <div className="grid grid-cols-2 gap-4">
-            <Select
-              value={styling.sectionDivider.type}
-              onValueChange={(value) =>
-                updateStyling({
-                  sectionDivider: {
-                    ...styling.sectionDivider,
-                    type: value as any,
-                  },
-                })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select divider type" />
-              </SelectTrigger>
-              <SelectContent>
-                {dividerTypes.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <div className="flex items-center gap-2">
-              <Input
-                type="color"
-                value={styling.sectionDivider.color}
-                onChange={(e) =>
-                  updateStyling({
-                    sectionDivider: {
-                      ...styling.sectionDivider,
-                      color: e.target.value,
-                    },
-                  })
-                }
-                className="w-12 h-12 p-1"
-              />
-              <span className="text-sm text-gray-500">Divider Color</span>
-            </div>
-          </div>
-          {/* Divider Preview */}
-          <div className="mt-4 p-4 border rounded-lg">
-            <Label className="text-sm text-gray-500 mb-2">Preview</Label>
-            <div className="h-8 flex items-center justify-center">
-              {styling.sectionDivider.type === "none" ? (
-                <div className="text-sm text-gray-400">No divider</div>
-              ) : styling.sectionDivider.type === "line" ? (
-                <div
-                  className="w-full h-px"
-                  style={{ backgroundColor: styling.sectionDivider.color }}
-                />
-              ) : styling.sectionDivider.type === "double-line" ? (
-                <div className="space-y-1 w-full">
-                  <div
-                    className="w-full h-px"
-                    style={{ backgroundColor: styling.sectionDivider.color }}
-                  />
-                  <div
-                    className="w-full h-px"
-                    style={{ backgroundColor: styling.sectionDivider.color }}
-                  />
-                </div>
-              ) : (
-                <div className="flex gap-1">
-                  {Array(10)
-                    .fill(0)
-                    .map((_, i) => (
-                      <div
-                        key={i}
-                        className="w-2 h-px"
-                        style={{
-                          backgroundColor: styling.sectionDivider.color,
-                        }}
-                      />
-                    ))}
-                </div>
-              )}
-            </div>
-          </div>
+          <Label>Font Size</Label>
+          <Input
+            type="number"
+            value={style.fontSize}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleStyleUpdate({ fontSize: Number(e.target.value) })}
+            min={8}
+            max={16}
+            step={0.5}
+          />
+        </div>
+
+        {/* Line Spacing */}
+        <div className="space-y-2">
+          <Label>Line Spacing</Label>
+          <Input
+            type="number"
+            value={style.spacing}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleStyleUpdate({ spacing: Number(e.target.value) })}
+            min={1}
+            max={2}
+            step={0.05}
+          />
+        </div>
+
+        {/* Color */}
+        <div className="space-y-2">
+          <Label>Accent Color</Label>
+          <Input
+            type="color"
+            value={style.color}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleStyleUpdate({ color: e.target.value })}
+          />
         </div>
       </div>
-      
-      {/* Save Button */}
-      <div className="flex justify-end pt-4 border-t">
-        <Button
-          onClick={handleSaveStyles}
-          disabled={isSubmitting}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? 'Saving...' : 'Save Styles'}
-        </Button>
-      </div>
-      
+
       {submitSuccess && (
-        <p className="text-sm text-green-600 text-center">
-          Styles saved successfully! The preview will reflect these changes.
-        </p>
+        <div className="p-4 text-sm text-green-700 bg-green-100 rounded-lg">
+          Styles saved successfully!
+        </div>
       )}
+
+      <Button
+        onClick={handleSaveStyles}
+        disabled={isSubmitting}
+        className="w-full"
+      >
+        {isSubmitting ? 'Saving...' : 'Save Styles'}
+      </Button>
     </div>
-  );
+  )
 }

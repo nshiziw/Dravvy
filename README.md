@@ -1,77 +1,105 @@
-# Dravvy
+# Dravvy - Professional Resume Builder
 
-A modern web application built with Next.js 14, featuring a beautiful and responsive user interface powered by Radix UI components and Tailwind CSS.
+A modern, feature-rich resume builder application built with Next.js, TypeScript, and Tailwind CSS.
 
-## 🚀 Features
+## Features
 
-- ⚡ Next.js 14 with App Router
-- 🎨 Modern UI with Radix UI components
-- 🎯 TypeScript for type safety
-- 💅 Tailwind CSS for styling
-- 📱 Responsive design
-- 🧩 Component-based architecture
-- 🔄 State management with Zustand
-- 📝 Form handling with React Hook Form and Zod validation
-- 🎨 Beautiful animations and transitions
+- 📝 Multi-step resume creation process
+- 🎨 Multiple resume themes and styling options
+- 📱 Fully responsive design
+- 🔄 Real-time preview
+- 💾 Automatic saving of progress
+- 📤 Export to PDF and DOCX formats
+- ✨ Beautiful UI with smooth animations
+- 🔒 Form validation and error handling
+- 🌐 SEO optimized
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Framework:** Next.js 14
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
-- **UI Components:** Radix UI
 - **State Management:** Zustand
 - **Form Handling:** React Hook Form + Zod
-- **Icons:** Lucide React
-- **Date Handling:** date-fns
-- **Drag and Drop:** react-beautiful-dnd
+- **UI Components:** Radix UI
+- **Testing:** Jest + React Testing Library
+- **PDF Generation:** @react-pdf/renderer
+- **DOCX Generation:** docx
 
-## 📦 Getting Started
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
 
 1. Clone the repository:
+   ```bash
+   git clone https://github.com/nshiziw/dravvy.git
+   cd dravvy
+   ```
 
-```bash
-git clone https://github.com/nshiziw/dravvy.git
-cd dravvy
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Project Structure
+
 ```
-
-1. Install dependencies:
-
-```bash
-npm install
-```
-
-1. Run the development server:
-
-```bash
-npm run dev
-```
-
-1. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
-
-## 🏗️ Project Structure
-
-```text
 dravvy/
-├── src/              # Source code
-├── public/           # Static assets
-├── components/       # Reusable components
-├── styles/          # Global styles
-└── app/             # Next.js app directory
+├── src/
+│   ├── app/              # Next.js app directory
+│   ├── components/       # React components
+│   ├── hooks/           # Custom React hooks
+│   ├── lib/             # Utility functions and configurations
+│   ├── store/           # Zustand store
+│   ├── types/           # TypeScript type definitions
+│   └── test/            # Test utilities and setup
+├── public/              # Static files
+└── scripts/             # Build and deployment scripts
 ```
 
-## 📚 Documentation
+## Testing
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Radix UI Documentation](https://www.radix-ui.com/docs)
-- [Zustand Documentation](https://github.com/pmndrs/zustand)
-- [React Hook Form Documentation](https://react-hook-form.com/)
+Run the test suite:
 
-## 🤝 Contributing
+```bash
+npm test          # Run all tests
+npm test:watch    # Run tests in watch mode
+npm test:coverage # Run tests with coverage report
+```
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## Contributing
 
-## 📄 License
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Next.js](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Radix UI](https://www.radix-ui.com/)
+- [Zustand](https://github.com/pmndrs/zustand)
+- [React Hook Form](https://react-hook-form.com/)
+- [Zod](https://github.com/colinhacks/zod)

@@ -1,7 +1,9 @@
 'use client'
 
-import { useResumeStore } from '@/store/useResumeStore';
-import { StyleSheet, Document, Page, View, Text } from '@react-pdf/renderer';
+// @ts-ignore
+import { StyleSheet, Document, Page, View, Text } from '@react-pdf/renderer'
+import { useResumeStore } from '@/store/useResumeStore'
+import type { ResumeData, Experience, Education, Skill, Project } from '@/types/resume'
 
 const styles = StyleSheet.create({
   page: {
@@ -114,45 +116,50 @@ const formatDate = (date: string) => {
 
 export function ResumePDF() {
   try {
-    const resume = useResumeStore.getState().resume;
-    const styling = useResumeStore.getState().styling;
+    const contact = useResumeStore.getState().contact;
+    const summary = useResumeStore.getState().summary;
+    const experience = useResumeStore.getState().experience;
+    const education = useResumeStore.getState().education;
+    const skills = useResumeStore.getState().skills;
+    const projects = useResumeStore.getState().projects;
+    const styling = useResumeStore.getState().style;
 
     return (
       <Document>
         <Page size="A4" style={styles.page}>
           <View style={styles.header}>
-            <Text style={styles.title}>{resume.contact.name}</Text>
+            <Text style={styles.title}>{contact.fullName}</Text>
             <View style={styles.contactInfo}>
-              <Text style={styles.contactText}>{resume.contact.email}</Text>
+              <Text style={styles.contactText}>{contact.email}</Text>
             </View>
             <View style={styles.contactInfo}>
-              <Text style={styles.contactText}>{resume.contact.phone}</Text>
+              <Text style={styles.contactText}>{contact.phone}</Text>
             </View>
             <View style={styles.contactInfo}>
-              <Text style={styles.contactText}>{resume.contact.location}</Text>
+              <Text style={styles.contactText}>{contact.location}</Text>
             </View>
           </View>
 
-          {resume.summary && (
+          {summary && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Summary</Text>
-              <Text style={styles.description}>{resume.summary}</Text>
+              <Text style={styles.description}>{summary}</Text>
             </View>
           )}
 
-          {resume.experience.length > 0 && (
+          {experience.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Experience</Text>
-              {resume.experience.map((exp, index) => (
-                <View key={index} style={{ marginBottom: 15 }}>
-                  <Text style={styles.itemTitle}>{exp.jobTitle}</Text>
+              {experience.map((exp: Experience, index: number) => (
+                <View key={exp.id} style={{ marginBottom: 15 }}>
+                  <Text style={styles.itemTitle}>{exp.position}</Text>
                   <Text style={styles.itemSubtitle}>
-                    {exp.company} • {exp.location}
+                    {exp.company}
                   </Text>
                   <Text style={styles.itemSubtitle}>
-                    {formatDate(exp.startDate)} - {exp.isPresent ? 'Present' : formatDate(exp.endDate || '')}
+                    {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
                   </Text>
-                  {exp.description.map((desc, i) => (
+                  {exp.description.map((desc: string, i: number) => (
                     <View key={i} style={styles.bulletContainer}>
                       <View style={styles.bullet} />
                       <Text style={styles.bulletText}>{desc}</Text>
@@ -163,63 +170,57 @@ export function ResumePDF() {
             </View>
           )}
 
-          {resume.education.length > 0 && (
+          {education.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Education</Text>
-              {resume.education.map((edu, index) => (
-                <View key={index} style={{ marginBottom: 12 }}>
+              {education.map((edu: Education, index: number) => (
+                <View key={edu.id} style={{ marginBottom: 12 }}>
                   <Text style={styles.itemTitle}>{edu.degree}</Text>
                   <Text style={styles.itemSubtitle}>
-                    {edu.institution} • {edu.location}
+                    {edu.school} • {edu.field}
                   </Text>
                   <Text style={styles.itemSubtitle}>
-                    {formatDate(edu.startDate)} - 
-                    {edu.isExpected 
-                      ? `Expected ${formatDate(edu.expectedDate || '')}` 
-                      : formatDate(edu.endDate || '')}
+                    {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
+                    {edu.gpa && ` • GPA: ${edu.gpa}`}
                   </Text>
                 </View>
               ))}
             </View>
           )}
 
-          {resume.skills.length > 0 && (
+          {skills.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Skills</Text>
               <View style={styles.skillsGrid}>
-                {resume.skills.map((skill, index) => (
-                  <View key={index} style={styles.skillTag}>
-                    <Text>
-                      {skill.name}
-                      {styling.showSkillProficiency && skill.proficiency 
-                        ? ` (${skill.proficiency}%)`
-                        : ''}
-                    </Text>
+                {skills.map((skill: Skill, index: number) => (
+                  <View key={skill.id} style={styles.skillTag}>
+                    <Text style={styles.itemTitle}>{skill.category}</Text>
+                    <Text>{skill.skills.join(', ')}</Text>
                   </View>
                 ))}
               </View>
             </View>
           )}
 
-          {resume.projects.length > 0 && (
+          {projects.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Projects</Text>
-              {resume.projects.map((project, index) => (
-                <View key={index} style={{ marginBottom: 15 }}>
+              {projects.map((project: Project, index: number) => (
+                <View key={project.id} style={{ marginBottom: 15 }}>
                   <Text style={styles.itemTitle}>{project.name}</Text>
-                  <Text style={styles.description}>{project.description}</Text>
+                  {project.description.map((desc: string, i: number) => (
+                    <Text key={i} style={styles.description}>{desc}</Text>
+                  ))}
                   <View style={styles.skillsGrid}>
-                    {project.technologies.map((tech, i) => (
+                    {project.technologies.map((tech: string, i: number) => (
                       <View key={i} style={styles.skillTag}>
                         <Text>{tech}</Text>
                       </View>
                     ))}
                   </View>
-                  {styling.showLinks && (project.githubLink || project.demoLink) && (
+                  {project.link && (
                     <Text style={styles.description}>
-                      {project.githubLink && `GitHub: ${project.githubLink}`}
-                      {project.githubLink && project.demoLink && ' • '}
-                      {project.demoLink && `Demo: ${project.demoLink}`}
+                      Link: {project.link}
                     </Text>
                   )}
                 </View>
@@ -228,9 +229,9 @@ export function ResumePDF() {
           )}
         </Page>
       </Document>
-    );
+    )
   } catch (error) {
-    console.error('Error generating PDF:', error);
+    console.error('Error rendering PDF:', error);
     return null;
   }
 }

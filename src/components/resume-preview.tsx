@@ -1,4 +1,8 @@
-import { useResumeStore } from '@/store/useResumeStore';
+'use client'
+
+import * as React from 'react'
+import { useResumeStore } from '@/store/useResumeStore'
+import type { ResumeData } from '@/types/resume'
 
 const formatDate = (dateString: string) => {
   try {
@@ -14,17 +18,22 @@ const formatDate = (dateString: string) => {
   }
 };
 
-export function ResumePreview() {
-  const resume = useResumeStore((state) => state.resume)
-  const styling = useResumeStore((state) => state.styling)
+export function ResumePreview(): JSX.Element {
+  const contact = useResumeStore((state: { contact: ResumeData['contact'] }) => state.contact)
+  const summary = useResumeStore((state: { summary: ResumeData['summary'] }) => state.summary)
+  const experience = useResumeStore((state: { experience: ResumeData['experience'] }) => state.experience)
+  const education = useResumeStore((state: { education: ResumeData['education'] }) => state.education)
+  const skills = useResumeStore((state: { skills: ResumeData['skills'] }) => state.skills)
+  const projects = useResumeStore((state: { projects: ResumeData['projects'] }) => state.projects)
+  const styling = useResumeStore((state: { style: ResumeData['style'] }) => state.style)
 
   const renderDivider = () => {
-    switch (styling.sectionDivider.type) {
+    switch (styling.sectionDivider?.type) {
       case 'line':
         return <div className="w-full h-px my-4" style={{ backgroundColor: styling.sectionDivider.color }} />;
       case 'double-line':
         return (
-          <div className="space-y-1 my-4">
+          <div className="my-4 space-y-1">
             <div className="w-full h-px" style={{ backgroundColor: styling.sectionDivider.color }} />
             <div className="w-full h-px" style={{ backgroundColor: styling.sectionDivider.color }} />
           </div>
@@ -43,35 +52,35 @@ export function ResumePreview() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6" style={{ fontFamily: styling.fontFamily }}>
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">Preview</h2>
+    <div className="p-6 bg-white rounded-lg shadow" style={{ fontFamily: styling.fontFamily }}>
+      <h2 className="mb-4 text-lg font-semibold text-gray-900">Preview</h2>
       <div className="space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold text-gray-900">{resume.contact.name}</h1>
-          <div className="text-sm text-gray-600 space-x-2">
-            {resume.contact.phone && (
+        <div className="space-y-2 text-center">
+          <h1 className="text-2xl font-bold text-gray-900">{contact.name}</h1>
+          <div className="space-x-2 text-sm text-gray-600">
+            {contact.phone && (
               styling.showLinks ? (
-                <a href={`tel:${resume.contact.phone}`} className="hover:text-blue-600 transition-colors">
-                  {resume.contact.phone}
+                <a href={`tel:${contact.phone}`} className="transition-colors hover:text-blue-600">
+                  {contact.phone}
                 </a>
               ) : (
-                <span>{resume.contact.phone}</span>
+                <span>{contact.phone}</span>
               )
             )}
-            {resume.contact.phone && resume.contact.email && <span>•</span>}
-            {resume.contact.email && (
+            {contact.phone && contact.email && <span>•</span>}
+            {contact.email && (
               styling.showLinks ? (
-                <a href={`mailto:${resume.contact.email}`} className="hover:text-blue-600 transition-colors">
-                  {resume.contact.email}
+                <a href={`mailto:${contact.email}`} className="transition-colors hover:text-blue-600">
+                  {contact.email}
                 </a>
               ) : (
-                <span>{resume.contact.email}</span>
+                <span>{contact.email}</span>
               )
             )}
-            {resume.contact.email && resume.contact.linkedin && <span>•</span>}
-            {resume.contact.linkedin && (
+            {contact.email && contact.linkedin && <span>•</span>}
+            {contact.linkedin && (
               styling.showLinks ? (
-                <a href={resume.contact.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors">
+                <a href={contact.linkedin} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-blue-600">
                   LinkedIn
                 </a>
               ) : (
@@ -79,29 +88,29 @@ export function ResumePreview() {
               )
             )}
           </div>
-          <div className="text-sm text-gray-600 space-x-2">
-            {resume.contact.github && (
+          <div className="space-x-2 text-sm text-gray-600">
+            {contact.github && (
               styling.showLinks ? (
-                <a href={resume.contact.github} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors">
+                <a href={contact.github} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-blue-600">
                   GitHub
                 </a>
               ) : (
                 <span>GitHub</span>
               )
             )}
-            {resume.contact.github && resume.contact.website && <span>•</span>}
-            {resume.contact.website && (
+            {contact.github && contact.website && <span>•</span>}
+            {contact.website && (
               styling.showLinks ? (
-                <a href={resume.contact.website} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors">
+                <a href={contact.website} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-blue-600">
                   Portfolio
                 </a>
               ) : (
                 <span>Portfolio</span>
               )
             )}
-            {(resume.contact.website || resume.contact.github) && resume.contact.location && <span>•</span>}
-            {resume.contact.location && (
-              <span>{resume.contact.location}</span>
+            {(contact.website || contact.github) && contact.location && <span>•</span>}
+            {contact.location && (
+              <span>{contact.location}</span>
             )}
           </div>
         </div>
@@ -110,16 +119,16 @@ export function ResumePreview() {
 
         <div>
           <h4 className="font-medium text-gray-900">Summary</h4>
-          <p className="text-sm text-gray-600">{resume.summary}</p>
+          <p className="text-sm text-gray-600">{summary}</p>
         </div>
         
-        {resume.experience.length > 0 && (
+        {experience.length > 0 && (
           <>
             {renderDivider()}
             <div className="space-y-4">
               <h4 className="font-medium text-gray-900">Experience</h4>
-              {resume.experience.map((exp, index) => (
-                <div key={index} className="space-y-2">
+              {experience.map((exp, index) => (
+                <div key={exp.id} className="space-y-2">
                   <div className="flex justify-between">
                     <h5 className="font-semibold text-gray-800">{exp.jobTitle}</h5>
                     <span className="text-sm text-gray-600">
@@ -130,7 +139,7 @@ export function ResumePreview() {
                     <span>{exp.company}</span>
                     <span>{exp.location}</span>
                   </div>
-                  <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+                  <ul className="space-y-1 text-sm text-gray-600 list-disc list-inside">
                     {exp.description.map((point, pointIndex) => (
                       <li key={pointIndex}>{point}</li>
                     ))}
@@ -141,13 +150,13 @@ export function ResumePreview() {
           </>
         )}
 
-        {resume.education.length > 0 && (
+        {education.length > 0 && (
           <>
             {renderDivider()}
             <div className="space-y-4">
               <h4 className="font-medium text-gray-900">Education</h4>
-              {resume.education.map((edu, index) => (
-                <div key={index} className="space-y-2">
+              {education.map((edu, index) => (
+                <div key={edu.id} className="space-y-2">
                   <div className="flex justify-between">
                     <h5 className="font-semibold text-gray-800">{edu.degree}</h5>
                     <span className="text-sm text-gray-600">
@@ -164,13 +173,13 @@ export function ResumePreview() {
           </>
         )}
 
-        {resume.projects.length > 0 && (
+        {projects.length > 0 && (
           <>
             {renderDivider()}
             <div className="space-y-4">
               <h4 className="font-medium text-gray-900">Projects</h4>
-              {resume.projects.map((project, index) => (
-                <div key={index} className="space-y-2">
+              {projects.map((project, index) => (
+                <div key={project.id} className="space-y-2">
                   <div className="flex justify-between">
                     <h5 className="font-semibold text-gray-800">{project.name}</h5>
                   </div>
@@ -210,15 +219,15 @@ export function ResumePreview() {
           </>
         )}
 
-        {resume.skills.length > 0 && (
+        {skills.length > 0 && (
           <>
             {renderDivider()}
             <div className="space-y-4">
               <h4 className="font-medium text-gray-900">Skills</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {resume.skills.map((skill, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex justify-between items-center">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {skills.map((skill, index) => (
+                  <div key={skill.id} className="space-y-2">
+                    <div className="flex items-center justify-between">
                       <span className="font-medium text-gray-800">{skill.name}</span>
                       {styling.showSkillProficiency && skill.proficiency !== undefined && (
                         <span className="text-sm text-gray-600">{skill.proficiency}%</span>
@@ -232,46 +241,6 @@ export function ResumePreview() {
                         />
                       </div>
                     )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-
-        {resume.certifications.length > 0 && (
-          <>
-            {renderDivider()}
-            <div className="mt-6">
-              <h2 className="text-xl font-bold">Certifications</h2>
-              <div className="mt-2 space-y-2">
-                {resume.certifications.map((cert, index) => (
-                  <div key={index} className="flex justify-between">
-                    <div>
-                      <h3 className="font-semibold">{cert.title}</h3>
-                      <p className="text-gray-600">{cert.issuer}</p>
-                    </div>
-                    <p className="text-gray-600">{formatDate(cert.issueDate)}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-
-        {resume.awards.length > 0 && (
-          <>
-            {renderDivider()}
-            <div className="mt-6">
-              <h2 className="text-xl font-bold">Awards</h2>
-              <div className="mt-2 space-y-2">
-                {resume.awards.map((award, index) => (
-                  <div key={index} className="flex justify-between">
-                    <div>
-                      <h3 className="font-semibold">{award.title}</h3>
-                      <p className="text-gray-600">{award.institution}</p>
-                    </div>
-                    <p className="text-gray-600">{formatDate(award.date)}</p>
                   </div>
                 ))}
               </div>

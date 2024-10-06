@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from 'sonner'
+import { ErrorBoundary } from '@/components/error-boundary'
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,8 +25,16 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Dravvy - Modern Resume Builder",
-  description: "Create professional resumes with various styling options",
+  title: "Dravvy - Resume Builder",
+  description: "Create professional resumes with ease",
+  keywords: ['resume', 'cv', 'builder', 'job', 'career'],
+  authors: [{ name: 'Dravvy' }],
+  creator: 'Dravvy',
+  publisher: 'Dravvy',
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -36,10 +45,20 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <main className="min-h-screen bg-gray-50">
-          {children}
-        </main>
-        <Toaster richColors position="top-center" />
+        <ErrorBoundary>
+          <main className="min-h-screen bg-gray-50">
+            {children}
+          </main>
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              style: {
+                background: 'white',
+                color: 'black',
+              },
+            }}
+          />
+        </ErrorBoundary>
       </body>
     </html>
   );
