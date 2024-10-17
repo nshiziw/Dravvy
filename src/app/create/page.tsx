@@ -7,6 +7,9 @@ import { useUIStore } from '@/store/useUIStore'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
 import { Toaster } from 'sonner'
+import { useRouter } from 'next/navigation'
+import React from 'react'
+import { useResumeStore } from '@/store/useResumeStore'
 
 type Section = {
   id: 'basic' | 'work' | 'education' | 'skills' | 'certifications' | 'projects' | 'languages' | 'references'
@@ -27,9 +30,16 @@ const sections: Section[] = [
 export default function CreatePage() {
   const activeSection = useUIStore((state) => state.activeSection)
   const setActiveSection = useUIStore((state) => state.setActiveSection)
+  const references = useResumeStore((state) => state.references)
+  const [hasSavedReferences, setHasSavedReferences] = React.useState(false)
+  const router = useRouter()
 
   const handleNext = () => {
-    if (activeSection < sections.length - 1) {
+    if (activeSection === sections.length - 1) {
+      if (hasSavedReferences) {
+        router.push('/settings')
+      }
+    } else {
       setActiveSection(activeSection + 1)
     }
   }
@@ -63,7 +73,11 @@ export default function CreatePage() {
             <h2 className="mb-4 text-lg font-semibold text-gray-900">
               {sections[activeSection].label}
             </h2>
-            <ResumeForm section={sections[activeSection].id} />
+            <ResumeForm 
+              section={sections[activeSection].id} 
+              onReferencesSaved={() => setHasSavedReferences(true)}
+            />
+            
             <div className="flex justify-between mt-6">
               <Button
                 onClick={handlePrevious}
@@ -77,11 +91,13 @@ export default function CreatePage() {
               </Button>
               <Button
                 onClick={handleNext}
-                disabled={activeSection === sections.length - 1}
                 variant="outline"
+                disabled={activeSection === sections.length - 1 && !hasSavedReferences}
                 className="relative overflow-hidden group px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                <span className="relative z-10">Next</span>
+                <span className="relative z-10">
+                  {activeSection === sections.length - 1 ? 'Go to Settings' : 'Next'}
+                </span>
                 <ChevronRightIcon className="relative z-10 w-5 h-5" />
                 <span className="absolute inset-0 w-0 transition-all duration-300 bg-blue-600 group-hover:w-full"></span>
               </Button>

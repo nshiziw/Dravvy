@@ -20,6 +20,7 @@ import { useRouter } from 'next/navigation'
 
 interface ResumeFormProps {
   section: 'basic' | 'work' | 'education' | 'skills' | 'certifications' | 'projects' | 'languages' | 'references'
+  onReferencesSaved?: () => void
 }
 
 const inputStyles = "w-full px-4 py-2.5 text-gray-700 bg-white border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 ease-in-out placeholder-gray-400 outline-none"
@@ -376,93 +377,99 @@ function MainResumeForm({ section }: ResumeFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6">
       {section === 'basic' && (
         <div className="space-y-4">
-          <div>
-            <Label htmlFor="fullName" className={labelStyles}>
-              Full Name <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="fullName"
-              type="text"
-              value={contact.fullName}
-              onChange={(e) => updateContact({ ...contact, fullName: e.target.value })}
-              className={inputStyles}
-              required
-            />
+          <div className='grid grid-cols-2 gap-4'>
+            <div>
+              <Label htmlFor="fullName" className={labelStyles}>
+                Full Name <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="fullName"
+                type="text"
+                value={contact.fullName}
+                onChange={(e) => updateContact({ ...contact, fullName: e.target.value })}
+                className={inputStyles}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="email" className={labelStyles}>
+                Email <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={contact.email}
+                onChange={(e) => updateContact({ ...contact, email: e.target.value })}
+                className={inputStyles}
+                required
+              />
+            </div>
           </div>
-          <div>
-            <Label htmlFor="email" className={labelStyles}>
-              Email <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={contact.email}
-              onChange={(e) => updateContact({ ...contact, email: e.target.value })}
-              className={inputStyles}
-              required
-            />
+          <div className='grid grid-cols-2 gap-4'>
+            <div>
+              <Label htmlFor="phone" className={labelStyles}>
+                Phone <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={contact.phone}
+                onChange={(e) => updateContact({ ...contact, phone: e.target.value })}
+                className={inputStyles}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="location" className={labelStyles}>
+                Location <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="location"
+                type="text"
+                value={contact.location}
+                onChange={(e) => updateContact({ ...contact, location: e.target.value })}
+                className={inputStyles}
+                required
+              />
+            </div>
           </div>
-          <div>
-            <Label htmlFor="phone" className={labelStyles}>
-              Phone <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={contact.phone}
-              onChange={(e) => updateContact({ ...contact, phone: e.target.value })}
-              className={inputStyles}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="location" className={labelStyles}>
-              Location <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="location"
-              type="text"
-              value={contact.location}
-              onChange={(e) => updateContact({ ...contact, location: e.target.value })}
-              className={inputStyles}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="website" className={labelStyles}>
-              Website
-            </Label>
-            <Input
-              id="website"
-              type="url"
-              value={contact.website}
-              onChange={(e) => updateContact({ ...contact, website: e.target.value })}
-              className={inputStyles}
-            />
-          </div>
-          <div>
-            <Label htmlFor="linkedin" className={labelStyles}>
-              LinkedIn
-            </Label>
-            <Input
-              id="linkedin"
-              type="url"
-              value={contact.linkedin}
-              onChange={(e) => updateContact({ ...contact, linkedin: e.target.value })}
-              className={inputStyles}
-            />
-          </div>
-          <div>
-            <Label htmlFor="github" className={labelStyles}>
-              GitHub
-            </Label>
-            <Input
-              id="github"
-              type="url"
-              value={contact.github}
-              onChange={(e) => updateContact({ ...contact, github: e.target.value })}
-              className={inputStyles}
-            />
+          <div className='grid grid-cols-3 gap-4'>
+            <div>
+              <Label htmlFor="website" className={labelStyles}>
+                Personal Website
+              </Label>
+              <Input
+                id="website"
+                type="url"
+                value={contact.website}
+                onChange={(e) => updateContact({ ...contact, website: e.target.value })}
+                className={inputStyles}
+              />
+            </div>
+            <div>
+              <Label htmlFor="linkedin" className={labelStyles}>
+                LinkedIn Profile
+              </Label>
+              <Input
+                id="linkedin"
+                type="url"
+                value={contact.linkedin}
+                onChange={(e) => updateContact({ ...contact, linkedin: e.target.value })}
+                className={inputStyles}
+              />
+            </div>
+            <div>
+              <Label htmlFor="github" className={labelStyles}>
+                GitHub Link
+              </Label>
+              <Input
+                id="github"
+                type="url"
+                value={contact.github}
+                onChange={(e) => updateContact({ ...contact, github: e.target.value })}
+                className={inputStyles}
+              />
+            </div>
           </div>
           <div>
             <Label htmlFor="summary" className={labelStyles}>
@@ -1076,79 +1083,121 @@ function MainResumeForm({ section }: ResumeFormProps) {
       )}
 
       {section === 'references' && (
-        <div className="space-y-4">
-          {references.map((reference, index) => (
-            <div key={reference.id} className="p-4 space-y-4 border rounded-lg">
-              <div>
-                <Label htmlFor={`name-${index}`} className={labelStyles}>
-                  Name <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id={`name-${index}`}
-                  type="text"
-                  value={reference.name}
-                  onChange={(e) => handleReferenceChange(index, 'name', e.target.value)}
-                  className={inputStyles}
-                  required
+        <div className="space-y-8">
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold">Reference Options</h2>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="upon-request"
+                  name="reference-option"
+                  checked={referenceOption === 'uponRequest'}
+                  onChange={() => setReferenceOption('uponRequest')}
+                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                 />
-              </div>
-              <div>
-                <Label htmlFor={`relationship-${index}`} className={labelStyles}>
-                  Relationship <span className="text-red-500">*</span>
+                <Label htmlFor="upon-request">
+                  References available upon request
                 </Label>
-                <Input
-                  id={`relationship-${index}`}
-                  type="text"
-                  value={reference.relationship}
-                  onChange={(e) => handleReferenceChange(index, 'relationship', e.target.value)}
-                  className={inputStyles}
-                  required
-                />
               </div>
-              <div>
-                <Label htmlFor={`email-${index}`} className={labelStyles}>
-                  Email <span className="text-red-500">*</span>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="include-references"
+                  name="reference-option"
+                  checked={referenceOption === 'include'}
+                  onChange={() => setReferenceOption('include')}
+                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                />
+                <Label htmlFor="include-references">
+                  Include references in resume
                 </Label>
-                <Input
-                  id={`email-${index}`}
-                  type="email"
-                  value={reference.email}
-                  onChange={(e) => handleReferenceChange(index, 'email', e.target.value)}
-                  className={inputStyles}
-                  required
-                />
               </div>
-              <div>
-                <Label htmlFor={`phone-${index}`} className={labelStyles}>
-                  Phone <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id={`phone-${index}`}
-                  type="tel"
-                  value={reference.phone}
-                  onChange={(e) => handleReferenceChange(index, 'phone', e.target.value)}
-                  className={inputStyles}
-                  required
-                />
-              </div>
+            </div>
+          </div>
+
+          {referenceOption === 'include' && (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <h2 className="text-2xl font-semibold">References</h2>
+              {references.map((reference, index) => (
+                <Card key={reference.id} className="p-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor={`name-${index}`} className={labelStyles}>Name</Label>
+                      <Input
+                        id={`name-${index}`}
+                        value={reference.name}
+                        onChange={(e) => handleReferenceChange(index, 'name', e.target.value)}
+                        className={inputStyles}
+                        placeholder="Jane Smith"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`relationship-${index}`} className={labelStyles}>Relationship</Label>
+                      <Input
+                        id={`relationship-${index}`}
+                        value={reference.relationship}
+                        onChange={(e) => handleReferenceChange(index, 'relationship', e.target.value)}
+                        className={inputStyles}
+                        placeholder="Former Manager"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`email-${index}`} className={labelStyles}>Email</Label>
+                      <Input
+                        id={`email-${index}`}
+                        type="email"
+                        value={reference.email}
+                        onChange={(e) => handleReferenceChange(index, 'email', e.target.value)}
+                        className={inputStyles}
+                        placeholder="jane.smith@example.com"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`phone-${index}`} className={labelStyles}>Phone</Label>
+                      <Input
+                        id={`phone-${index}`}
+                        value={reference.phone}
+                        onChange={(e) => handleReferenceChange(index, 'phone', e.target.value)}
+                        className={inputStyles}
+                        placeholder="+1 (555) 123-4567"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => storeRemoveReference(reference.id)}
+                    className="mt-4"
+                  >
+                    Remove Reference
+                  </Button>
+                </Card>
+              ))}
               <Button
                 type="button"
-                onClick={() => storeRemoveReference(reference.id)}
-                variant="outline"
-                size="sm"
+                onClick={() => addReference()}
+                className="w-full"
               >
-                Remove Reference
+                Add Reference
               </Button>
-            </div>
-          ))}
-          <Button
-            type="button"
-            onClick={addReference}
-            variant="outline"
-            size="sm"
-          >
-            Add Reference
-          </Button>
+            </form>
+          )}
+
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              className={buttonStyles}
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
         </div>
       )}
 
@@ -1163,25 +1212,6 @@ function MainResumeForm({ section }: ResumeFormProps) {
           Data saved successfully
         </div>
       )}
-
-      <div className="flex justify-between">
-        <Button
-          type="submit"
-          className={buttonStyles}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Saving...' : 'Save Changes'}
-        </Button>
-        {section !== 'references' && (
-          <Button
-            type="button"
-            className={buttonStyles}
-            onClick={() => setActiveSection(activeSection + 1)}
-          >
-            Next
-          </Button>
-        )}
-      </div>
     </form>
   )
 }
@@ -1258,107 +1288,167 @@ function LanguageFormComponent() {
   )
 }
 
-function ReferenceFormComponent() {
+function ReferenceFormComponent({ onReferencesSaved }: { onReferencesSaved?: () => void }) {
   const references = useResumeStore((state) => state.references)
   const addReference = useResumeStore((state) => state.addReference)
   const updateReference = useResumeStore((state) => state.updateReference)
   const removeReference = useResumeStore((state) => state.removeReference)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const router = useRouter()
+  const [hasSaved, setHasSaved] = React.useState(false)
+  const [referenceOption, setReferenceOption] = React.useState<'uponRequest' | 'include'>('uponRequest')
+  const [error, setError] = React.useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
+
     try {
+      if (referenceOption === 'include' && references.length === 0) {
+        throw new Error('At least one reference is required when including references')
+      }
+
       // Save references
       references.forEach(ref => updateReference(ref))
       toast.success('References saved successfully')
-      router.push('/settings')
+      setHasSaved(true)
+      onReferencesSaved?.()
     } catch (error) {
-      toast.error('Failed to save references')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save references'
+      setError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {references.map((reference, index) => (
-        <Card key={reference.id} className="p-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor={`name-${index}`} className={labelStyles}>Name</Label>
-              <Input
-                id={`name-${index}`}
-                value={reference.name}
-                onChange={(e) => updateReference({ ...reference, name: e.target.value })}
-                className={inputStyles}
-                placeholder="Jane Smith"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor={`relationship-${index}`} className={labelStyles}>Relationship</Label>
-              <Input
-                id={`relationship-${index}`}
-                value={reference.relationship}
-                onChange={(e) => updateReference({ ...reference, relationship: e.target.value })}
-                className={inputStyles}
-                placeholder="Former Manager"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor={`email-${index}`} className={labelStyles}>Email</Label>
-              <Input
-                id={`email-${index}`}
-                type="email"
-                value={reference.email}
-                onChange={(e) => updateReference({ ...reference, email: e.target.value })}
-                className={inputStyles}
-                placeholder="jane.smith@example.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor={`phone-${index}`} className={labelStyles}>Phone</Label>
-              <Input
-                id={`phone-${index}`}
-                value={reference.phone}
-                onChange={(e) => updateReference({ ...reference, phone: e.target.value })}
-                className={inputStyles}
-                placeholder="+1 (555) 123-4567"
-              />
-            </div>
+    <div className="space-y-8">
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold">Reference Options</h2>
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <input
+              type="radio"
+              id="upon-request"
+              name="reference-option"
+              checked={referenceOption === 'uponRequest'}
+              onChange={() => setReferenceOption('uponRequest')}
+              className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+            />
+            <Label htmlFor="upon-request">
+              References available upon request
+            </Label>
           </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="radio"
+              id="include-references"
+              name="reference-option"
+              checked={referenceOption === 'include'}
+              onChange={() => setReferenceOption('include')}
+              className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+            />
+            <Label htmlFor="include-references">
+              Include references in resume
+            </Label>
+          </div>
+        </div>
+      </div>
+
+      {referenceOption === 'include' && (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <h2 className="text-2xl font-semibold">References</h2>
+          {references.map((reference, index) => (
+            <Card key={reference.id} className="p-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor={`name-${index}`} className={labelStyles}>Name</Label>
+                  <Input
+                    id={`name-${index}`}
+                    value={reference.name}
+                    onChange={(e) => updateReference({ ...reference, name: e.target.value })}
+                    className={inputStyles}
+                    placeholder="Jane Smith"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`relationship-${index}`} className={labelStyles}>Relationship</Label>
+                  <Input
+                    id={`relationship-${index}`}
+                    value={reference.relationship}
+                    onChange={(e) => updateReference({ ...reference, relationship: e.target.value })}
+                    className={inputStyles}
+                    placeholder="Former Manager"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`email-${index}`} className={labelStyles}>Email</Label>
+                  <Input
+                    id={`email-${index}`}
+                    type="email"
+                    value={reference.email}
+                    onChange={(e) => updateReference({ ...reference, email: e.target.value })}
+                    className={inputStyles}
+                    placeholder="jane.smith@example.com"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`phone-${index}`} className={labelStyles}>Phone</Label>
+                  <Input
+                    id={`phone-${index}`}
+                    value={reference.phone}
+                    onChange={(e) => updateReference({ ...reference, phone: e.target.value })}
+                    className={inputStyles}
+                    placeholder="+1 (555) 123-4567"
+                    required
+                  />
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => removeReference(reference.id)}
+                className="mt-4"
+              >
+                Remove Reference
+              </Button>
+            </Card>
+          ))}
           <Button
             type="button"
-            variant="outline"
-            onClick={() => removeReference(reference.id)}
-            className="mt-4"
+            onClick={() => addReference({ name: '', relationship: '', email: '', phone: '' })}
+            className="w-full"
           >
-            Remove Reference
+            Add Reference
           </Button>
-        </Card>
-      ))}
-      <Button
-        type="button"
-        onClick={() => addReference({ name: '', relationship: '', email: '', phone: '' })}
-        className="w-full"
-      >
-        Add Reference
-      </Button>
-      <div className="flex justify-between">
+        </form>
+      )}
+
+      {error && (
+        <div className="text-sm text-red-500">
+          {error}
+        </div>
+      )}
+
+      <div className="flex justify-end">
         <Button
           type="submit"
           className={buttonStyles}
+          onClick={handleSubmit}
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Saving...' : 'Save Changes'}
         </Button>
       </div>
-    </form>
+    </div>
   )
 }
 
-export function ResumeForm({ section }: ResumeFormProps) {
+export function ResumeForm({ section, onReferencesSaved }: ResumeFormProps) {
   const { activeSection } = useUIStore()
 
   if (section === 'languages') {
@@ -1366,7 +1456,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
   }
 
   if (section === 'references') {
-    return <ReferenceFormComponent />
+    return <ReferenceFormComponent onReferencesSaved={onReferencesSaved} />
   }
 
   return <MainResumeForm section={section} />
