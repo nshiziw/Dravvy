@@ -7,32 +7,28 @@ export interface Contact {
   email: string
   phone: string
   location: string
-  website?: string
-  linkedin?: string
-  github?: string
-  photo?: string
 }
 
 export interface Experience {
-  position: string
   company: string
-  location: string
-  startDate: Date
-  endDate: Date | 'Present'
-  description: string[]
+  position: string
+  startDate: string
+  endDate: string
+  description: string
 }
 
 export interface Education {
-  degree: string
   institution: string
-  location: string
-  startDate: Date
-  endDate: Date | 'Expected'
+  degree: string
+  field: string
+  startDate: string
+  endDate: string
 }
 
-export interface Skill {
+export interface Project {
   name: string
-  proficiency?: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
+  description: string
+  technologies: string[]
 }
 
 export interface Resume {
@@ -40,30 +36,18 @@ export interface Resume {
   summary: string
   experience: Experience[]
   education: Education[]
-  skills: Skill[]
+  skills: string[]
   projects: Project[]
 }
 
-export interface Project {
-  name: string
-  description: string
-  technologies: string[]
-  link?: string
-}
-
-interface ResumeStore {
+type ResumeStore = {
   resume: Resume
-  setResume: (resume: Resume) => void
   updateContact: (contact: Contact) => void
   updateSummary: (summary: string) => void
-  addExperience: (experience: Experience) => void
-  removeExperience: (index: number) => void
-  addEducation: (education: Education) => void
-  removeEducation: (index: number) => void
-  addSkill: (skill: Skill) => void
-  removeSkill: (index: number) => void
-  addProject: (project: Project) => void
-  removeProject: (index: number) => void
+  updateExperience: (experience: Experience[]) => void
+  updateEducation: (education: Education[]) => void
+  updateSkills: (skills: string[]) => void
+  updateProjects: (projects: Project[]) => void
 }
 
 const initialResume: Resume = {
@@ -85,7 +69,6 @@ export const useResumeStore = create<ResumeStore>()(
   persist(
     (set) => ({
       resume: initialResume,
-      setResume: (resume) => set({ resume }),
       updateContact: (contact) =>
         set((state) => ({
           resume: { ...state.resume, contact },
@@ -94,65 +77,26 @@ export const useResumeStore = create<ResumeStore>()(
         set((state) => ({
           resume: { ...state.resume, summary },
         })),
-      addExperience: (experience) =>
+      updateExperience: (experience) =>
         set((state) => ({
-          resume: {
-            ...state.resume,
-            experience: [...state.resume.experience, experience],
-          },
+          resume: { ...state.resume, experience },
         })),
-      removeExperience: (index) =>
+      updateEducation: (education) =>
         set((state) => ({
-          resume: {
-            ...state.resume,
-            experience: state.resume.experience.filter((_, i) => i !== index),
-          },
+          resume: { ...state.resume, education },
         })),
-      addEducation: (education) =>
+      updateSkills: (skills) =>
         set((state) => ({
-          resume: {
-            ...state.resume,
-            education: [...state.resume.education, education],
-          },
+          resume: { ...state.resume, skills },
         })),
-      removeEducation: (index) =>
+      updateProjects: (projects) =>
         set((state) => ({
-          resume: {
-            ...state.resume,
-            education: state.resume.education.filter((_, i) => i !== index),
-          },
-        })),
-      addSkill: (skill) =>
-        set((state) => ({
-          resume: {
-            ...state.resume,
-            skills: [...state.resume.skills, skill],
-          },
-        })),
-      removeSkill: (index) =>
-        set((state) => ({
-          resume: {
-            ...state.resume,
-            skills: state.resume.skills.filter((_, i) => i !== index),
-          },
-        })),
-      addProject: (project) =>
-        set((state) => ({
-          resume: {
-            ...state.resume,
-            projects: [...state.resume.projects, project],
-          },
-        })),
-      removeProject: (index) =>
-        set((state) => ({
-          resume: {
-            ...state.resume,
-            projects: state.resume.projects.filter((_, i) => i !== index),
-          },
+          resume: { ...state.resume, projects },
         })),
     }),
     {
       name: 'resume-storage',
+      skipHydration: true,
     }
   )
 ) 
