@@ -1,3 +1,5 @@
+'use client'
+
 import { useResumeStore } from '@/store/useResumeStore'
 import { calculateProgress, getProgressMessage } from '@/lib/utils/progress'
 import { Progress } from '@/components/ui/progress'

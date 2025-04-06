@@ -1,7 +1,9 @@
+'use client'
+
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { resumeSchema } from '@/lib/validations/resume'
-import { useResumeStore } from '@/store/useResumeStore'
+import { useResumeStore, type Resume } from '@/store/useResumeStore'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -9,12 +11,12 @@ import { Label } from '@/components/ui/label'
 
 export function ResumeForm() {
   const { resume, updateContact, updateSummary } = useResumeStore()
-  const form = useForm({
+  const form = useForm<Resume>({
     resolver: zodResolver(resumeSchema),
     defaultValues: resume,
   })
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Resume) => {
     updateContact(data.contact)
     updateSummary(data.summary)
   }
@@ -34,7 +36,7 @@ export function ResumeForm() {
               />
               {form.formState.errors.contact?.name && (
                 <p className="text-sm text-red-500">
-                  {form.formState.errors.contact.name.message}
+                  {form.formState.errors.contact.name.message?.toString()}
                 </p>
               )}
             </div>
@@ -47,7 +49,7 @@ export function ResumeForm() {
               />
               {form.formState.errors.contact?.title && (
                 <p className="text-sm text-red-500">
-                  {form.formState.errors.contact.title.message}
+                  {form.formState.errors.contact.title.message?.toString()}
                 </p>
               )}
             </div>
@@ -61,7 +63,7 @@ export function ResumeForm() {
               />
               {form.formState.errors.contact?.email && (
                 <p className="text-sm text-red-500">
-                  {form.formState.errors.contact.email.message}
+                  {form.formState.errors.contact.email.message?.toString()}
                 </p>
               )}
             </div>
@@ -74,7 +76,7 @@ export function ResumeForm() {
               />
               {form.formState.errors.contact?.phone && (
                 <p className="text-sm text-red-500">
-                  {form.formState.errors.contact.phone.message}
+                  {form.formState.errors.contact.phone.message?.toString()}
                 </p>
               )}
             </div>
@@ -93,7 +95,7 @@ export function ResumeForm() {
             />
             {form.formState.errors.summary && (
               <p className="text-sm text-red-500">
-                {form.formState.errors.summary.message}
+                {form.formState.errors.summary.message?.toString()}
               </p>
             )}
           </div>

@@ -31,7 +31,7 @@ A modern web application built with Next.js 14, featuring a beautiful and respon
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/dravvy.git
+git clone https://github.com/nshiziw/dravvy.git
 cd dravvy
 ```
 
