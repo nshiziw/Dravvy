@@ -10,25 +10,31 @@ export interface Contact {
 }
 
 export interface Experience {
+  jobTitle: string
   company: string
-  position: string
+  location: string
   startDate: string
   endDate: string
-  description: string
+  isPresent: boolean
+  description: string[]
 }
 
-export interface Education {
-  institution: string
-  degree: string
-  field: string
-  startDate: string
-  endDate: string
-}
+type Education = {
+  degree: string;
+  institution: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  expectedDate: string;
+  isExpected: boolean;
+};
 
 export interface Project {
   name: string
   description: string
   technologies: string[]
+  githubLink?: string
+  demoLink?: string
 }
 
 export interface Resume {
@@ -79,7 +85,10 @@ export const useResumeStore = create<ResumeStore>()(
         })),
       updateExperience: (experience) =>
         set((state) => ({
-          resume: { ...state.resume, experience },
+          resume: {
+            ...state.resume,
+            experience,
+          },
         })),
       updateEducation: (education) =>
         set((state) => ({

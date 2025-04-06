@@ -20,6 +20,169 @@ export function ResumeForm({ section }: ResumeFormProps) {
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const [experiences, setExperiences] = useState<Array<{
+    jobTitle: string;
+    company: string;
+    location: string;
+    startDate: string;
+    endDate: string;
+    isPresent: boolean;
+    description: string[];
+  }>>([]);
+
+  const [newDescription, setNewDescription] = useState('');
+
+  const [educations, setEducations] = useState<Array<{
+    degree: string;
+    institution: string;
+    location: string;
+    startDate: string;
+    endDate: string;
+    expectedDate: string;
+    isExpected: boolean;
+  }>>([]);
+
+  const [projects, setProjects] = useState<Array<{
+    name: string;
+    description: string;
+    technologies: string[];
+    githubLink?: string;
+    demoLink?: string;
+    hasGithubLink: boolean;
+    hasDemoLink: boolean;
+  }>>([]);
+
+  const [newTechnology, setNewTechnology] = useState('');
+
+  const addExperience = () => {
+    setExperiences([...experiences, {
+      jobTitle: '',
+      company: '',
+      location: '',
+      startDate: '',
+      endDate: '',
+      isPresent: false,
+      description: []
+    }]);
+  };
+
+  const removeExperience = (index: number) => {
+    setExperiences(experiences.filter((_, i) => i !== index));
+  };
+
+  const addDescriptionPoint = (expIndex: number) => {
+    if (newDescription.trim() && experiences[expIndex].description.length < 5) {
+      const updatedExperiences = [...experiences];
+      updatedExperiences[expIndex].description.push(newDescription.trim());
+      setExperiences(updatedExperiences);
+      setNewDescription('');
+    }
+  };
+
+  const removeDescriptionPoint = (expIndex: number, descIndex: number) => {
+    const updatedExperiences = [...experiences];
+    updatedExperiences[expIndex].description = updatedExperiences[expIndex].description.filter((_, i) => i !== descIndex);
+    setExperiences(updatedExperiences);
+  };
+
+  const handleExperienceChange = (index: number, field: string, value: string | boolean) => {
+    const updatedExperiences = [...experiences];
+    updatedExperiences[index] = {
+      ...updatedExperiences[index],
+      [field]: value
+    };
+    setExperiences(updatedExperiences);
+  };
+
+  const handleExperienceSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateExperience(experiences);
+    setIsSubmitting(true);
+    setSubmitSuccess(true);
+    setTimeout(() => setSubmitSuccess(false), 3000);
+  };
+
+  const addEducation = () => {
+    setEducations([...educations, {
+      degree: '',
+      institution: '',
+      location: '',
+      startDate: '',
+      endDate: '',
+      expectedDate: '',
+      isExpected: false
+    }]);
+  };
+
+  const removeEducation = (index: number) => {
+    setEducations(educations.filter((_, i) => i !== index));
+  };
+
+  const handleEducationChange = (index: number, field: string, value: string | boolean) => {
+    const updatedEducations = [...educations];
+    updatedEducations[index] = {
+      ...updatedEducations[index],
+      [field]: value
+    };
+    setEducations(updatedEducations);
+  };
+
+  const handleEducationSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateEducation(educations);
+    setIsSubmitting(true);
+    setSubmitSuccess(true);
+    setTimeout(() => setSubmitSuccess(false), 3000);
+  };
+
+  const addProject = () => {
+    setProjects([...projects, {
+      name: '',
+      description: '',
+      technologies: [],
+      githubLink: '',
+      demoLink: '',
+      hasGithubLink: false,
+      hasDemoLink: false
+    }]);
+  };
+
+  const removeProject = (index: number) => {
+    setProjects(projects.filter((_, i) => i !== index));
+  };
+
+  const handleProjectChange = (index: number, field: string, value: string | string[]) => {
+    const updatedProjects = [...projects];
+    updatedProjects[index] = {
+      ...updatedProjects[index],
+      [field]: value
+    };
+    setProjects(updatedProjects);
+  };
+
+  const addTechnology = (projectIndex: number) => {
+    if (newTechnology.trim()) {
+      const updatedProjects = [...projects];
+      updatedProjects[projectIndex].technologies.push(newTechnology.trim());
+      setProjects(updatedProjects);
+      setNewTechnology('');
+    }
+  };
+
+  const removeTechnology = (projectIndex: number, techIndex: number) => {
+    const updatedProjects = [...projects];
+    updatedProjects[projectIndex].technologies = updatedProjects[projectIndex].technologies.filter((_, i) => i !== techIndex);
+    setProjects(updatedProjects);
+  };
+
+  const handleProjectSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateProjects(projects);
+    setIsSubmitting(true);
+    setSubmitSuccess(true);
+    setTimeout(() => setSubmitSuccess(false), 3000);
+  };
+
   useEffect(() => {
     console.log('Form mounted with section:', section)
     console.log('Current resume state:', resume)
@@ -207,187 +370,262 @@ export function ResumeForm({ section }: ResumeFormProps) {
 
   if (section === 'experience') {
     return (
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleExperienceSubmit} className="space-y-6">
         <div className="space-y-4">
-          {resume.experience.map((_, index) => (
-            <div key={index} className="border p-4 rounded-lg space-y-4">
+          {experiences.map((exp, index) => (
+            <div key={index} className="p-4 border rounded-lg space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Experience {index + 1}</h3>
+                <button
+                  type="button"
+                  onClick={() => removeExperience(index)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  Remove
+                </button>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor={`company-${index}`}>Company</Label>
-                  <Input
-                    id={`company-${index}`}
-                    {...form.register(`experience.${index}.company`)}
-                    placeholder="Company Name"
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Job Title</label>
+                  <input
+                    type="text"
+                    value={exp.jobTitle}
+                    onChange={(e) => handleExperienceChange(index, 'jobTitle', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`position-${index}`}>Position</Label>
-                  <Input
-                    id={`position-${index}`}
-                    {...form.register(`experience.${index}.position`)}
-                    placeholder="Job Title"
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Company Name</label>
+                  <input
+                    type="text"
+                    value={exp.company}
+                    onChange={(e) => handleExperienceChange(index, 'company', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`startDate-${index}`}>Start Date</Label>
-                  <Input
-                    id={`startDate-${index}`}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Location</label>
+                  <input
+                    type="text"
+                    value={exp.location}
+                    onChange={(e) => handleExperienceChange(index, 'location', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                  <input
                     type="date"
-                    {...form.register(`experience.${index}.startDate`)}
+                    value={exp.startDate}
+                    onChange={(e) => handleExperienceChange(index, 'startDate', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`endDate-${index}`}>End Date</Label>
-                  <Input
-                    id={`endDate-${index}`}
-                    type="date"
-                    {...form.register(`experience.${index}.endDate`)}
-                  />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">End Date</label>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="date"
+                      value={exp.endDate}
+                      onChange={(e) => handleExperienceChange(index, 'endDate', e.target.value)}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                      disabled={exp.isPresent}
+                    />
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={exp.isPresent}
+                        onChange={(e) => handleExperienceChange(index, 'isPresent', e.target.checked)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label className="ml-2 block text-sm text-gray-700">Present</label>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor={`description-${index}`}>Description</Label>
-                <Textarea
-                  id={`description-${index}`}
-                  {...form.register(`experience.${index}.description`)}
-                  placeholder="Describe your responsibilities and achievements..."
-                  rows={3}
-                />
+
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700">Description Points</label>
+                <div className="mt-2 space-y-2">
+                  {exp.description.map((point, descIndex) => (
+                    <div key={descIndex} className="flex items-center space-x-2">
+                      <span className="text-gray-500">•</span>
+                      <span className="flex-grow">{point}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeDescriptionPoint(index, descIndex)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  {exp.description.length < 5 && (
+                    <div className="flex space-x-2">
+                      <input
+                        type="text"
+                        value={newDescription}
+                        onChange={(e) => setNewDescription(e.target.value)}
+                        placeholder="Add a description point"
+                        className="flex-grow rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => addDescriptionPoint(index)}
+                        className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {exp.description.length < 2 && (
+                  <p className="mt-1 text-sm text-red-600">Add at least 2 description points</p>
+                )}
               </div>
             </div>
           ))}
-          <Button
+        </div>
+
+        <div className="flex justify-between">
+          <button
             type="button"
-            variant="outline"
-            onClick={() => {
-              const currentExperience = form.getValues('experience') || []
-              form.setValue('experience', [
-                ...currentExperience,
-                {
-                  company: '',
-                  position: '',
-                  startDate: '',
-                  endDate: '',
-                  description: '',
-                },
-              ])
-            }}
+            onClick={addExperience}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
             Add Experience
-          </Button>
-        </div>
-        <div className="space-y-2">
-          <Button 
-            type="submit" 
-            className="w-full"
-            disabled={isSubmitting}
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting || experiences.some(exp => exp.description.length < 2)}
+            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
-          </Button>
-          {submitSuccess && (
-            <p className="text-sm text-green-500 text-center">
-              Changes saved successfully!
-            </p>
-          )}
-          {error && (
-            <p className="text-sm text-red-500 text-center">
-              {error}
-            </p>
-          )}
+          </button>
         </div>
+
+        {submitSuccess && (
+          <p className="text-green-600">Changes saved successfully!</p>
+        )}
+        {error && (
+          <p className="text-red-600">{error}</p>
+        )}
       </form>
     )
   }
 
   if (section === 'education') {
     return (
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleEducationSubmit} className="space-y-6">
         <div className="space-y-4">
-          {resume.education.map((_, index) => (
-            <div key={index} className="border p-4 rounded-lg space-y-4">
+          {educations.map((edu, index) => (
+            <div key={index} className="p-4 border rounded-lg space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Education {index + 1}</h3>
+                <button
+                  type="button"
+                  onClick={() => removeEducation(index)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  Remove
+                </button>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor={`institution-${index}`}>Institution</Label>
-                  <Input
-                    id={`institution-${index}`}
-                    {...form.register(`education.${index}.institution`)}
-                    placeholder="University Name"
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Degree</label>
+                  <input
+                    type="text"
+                    value={edu.degree}
+                    onChange={(e) => handleEducationChange(index, 'degree', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`degree-${index}`}>Degree</Label>
-                  <Input
-                    id={`degree-${index}`}
-                    {...form.register(`education.${index}.degree`)}
-                    placeholder="Bachelor of Science"
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Institution</label>
+                  <input
+                    type="text"
+                    value={edu.institution}
+                    onChange={(e) => handleEducationChange(index, 'institution', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`field-${index}`}>Field of Study</Label>
-                  <Input
-                    id={`field-${index}`}
-                    {...form.register(`education.${index}.field`)}
-                    placeholder="Computer Science"
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Location</label>
+                  <input
+                    type="text"
+                    value={edu.location}
+                    onChange={(e) => handleEducationChange(index, 'location', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`startDate-${index}`}>Start Date</Label>
-                  <Input
-                    id={`startDate-${index}`}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                  <input
                     type="date"
-                    {...form.register(`education.${index}.startDate`)}
+                    value={edu.startDate}
+                    onChange={(e) => handleEducationChange(index, 'startDate', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`endDate-${index}`}>End Date</Label>
-                  <Input
-                    id={`endDate-${index}`}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    {edu.isExpected ? 'Expected Date' : 'End Date'}
+                  </label>
+                  <input
                     type="date"
-                    {...form.register(`education.${index}.endDate`)}
+                    value={edu.isExpected ? edu.expectedDate : edu.endDate}
+                    onChange={(e) => handleEducationChange(index, edu.isExpected ? 'expectedDate' : 'endDate', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
                   />
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={edu.isExpected}
+                    onChange={(e) => handleEducationChange(index, 'isExpected', e.target.checked)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label className="ml-2 block text-sm text-gray-700">Expected</label>
                 </div>
               </div>
             </div>
           ))}
-          <Button
+        </div>
+
+        <div className="flex justify-between">
+          <button
             type="button"
-            variant="outline"
-            onClick={() => {
-              const currentEducation = form.getValues('education') || []
-              form.setValue('education', [
-                ...currentEducation,
-                {
-                  institution: '',
-                  degree: '',
-                  field: '',
-                  startDate: '',
-                  endDate: '',
-                },
-              ])
-            }}
+            onClick={addEducation}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
             Add Education
-          </Button>
-        </div>
-        <div className="space-y-2">
-          <Button 
-            type="submit" 
-            className="w-full"
+          </button>
+          <button
+            type="submit"
             disabled={isSubmitting}
+            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
-          </Button>
-          {submitSuccess && (
-            <p className="text-sm text-green-500 text-center">
-              Changes saved successfully!
-            </p>
-          )}
-          {error && (
-            <p className="text-sm text-red-500 text-center">
-              {error}
-            </p>
-          )}
+          </button>
         </div>
+
+        {submitSuccess && (
+          <p className="text-green-600">Changes saved successfully!</p>
+        )}
+        {error && (
+          <p className="text-red-600">{error}</p>
+        )}
       </form>
     )
   }
@@ -478,121 +716,155 @@ export function ResumeForm({ section }: ResumeFormProps) {
 
   if (section === 'projects') {
     return (
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleProjectSubmit} className="space-y-6">
         <div className="space-y-4">
-          {resume.projects.map((_, index) => (
-            <div key={index} className="border p-4 rounded-lg space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor={`name-${index}`}>Project Name</Label>
-                <Input
-                  id={`name-${index}`}
-                  {...form.register(`projects.${index}.name`)}
-                  placeholder="Project Name"
-                />
+          {projects.map((project, index) => (
+            <div key={index} className="p-4 border rounded-lg space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Project {index + 1}</h3>
+                <button
+                  type="button"
+                  onClick={() => removeProject(index)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  Remove
+                </button>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor={`description-${index}`}>Description</Label>
-                <Textarea
-                  id={`description-${index}`}
-                  {...form.register(`projects.${index}.description`)}
-                  placeholder="Describe the project and your role..."
-                  rows={3}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Technologies</Label>
-                <div className="flex flex-wrap gap-2">
-                  {form.watch(`projects.${index}.technologies`)?.map((tech, techIndex) => (
-                    <div key={techIndex} className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
-                      <span>{tech}</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const currentTechs = form.getValues(`projects.${index}.technologies`) || []
-                          form.setValue(
-                            `projects.${index}.technologies`,
-                            currentTechs.filter((_, i) => i !== techIndex)
-                          )
-                        }}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Add a technology"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        const input = e.target as HTMLInputElement
-                        const newTech = input.value.trim()
-                        if (newTech) {
-                          const currentTechs = form.getValues(`projects.${index}.technologies`) || []
-                          form.setValue(`projects.${index}.technologies`, [...currentTechs, newTech])
-                          input.value = ''
-                        }
-                      }
-                    }}
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Project Name</label>
+                  <input
+                    type="text"
+                    value={project.name}
+                    onChange={(e) => handleProjectChange(index, 'name', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
                   />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      const input = document.querySelector(`input[placeholder="Add a technology"]`) as HTMLInputElement
-                      const newTech = input.value.trim()
-                      if (newTech) {
-                        const currentTechs = form.getValues(`projects.${index}.technologies`) || []
-                        form.setValue(`projects.${index}.technologies`, [...currentTechs, newTech])
-                        input.value = ''
-                      }
-                    }}
-                  >
-                    Add
-                  </Button>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Description</label>
+                  <textarea
+                    value={project.description}
+                    onChange={(e) => handleProjectChange(index, 'description', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    rows={3}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={project.hasGithubLink}
+                      onChange={(e) => handleProjectChange(index, 'hasGithubLink', e.target.checked)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label className="ml-2 block text-sm text-gray-700">Include GitHub Link</label>
+                  </div>
+                  {project.hasGithubLink && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">GitHub Link</label>
+                      <input
+                        type="url"
+                        value={project.githubLink}
+                        onChange={(e) => handleProjectChange(index, 'githubLink', e.target.value)}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                        placeholder="https://github.com/username/project"
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={project.hasDemoLink}
+                      onChange={(e) => handleProjectChange(index, 'hasDemoLink', e.target.checked)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label className="ml-2 block text-sm text-gray-700">Include Live Demo Link</label>
+                  </div>
+                  {project.hasDemoLink && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Live Demo Link</label>
+                      <input
+                        type="url"
+                        value={project.demoLink}
+                        onChange={(e) => handleProjectChange(index, 'demoLink', e.target.value)}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                        placeholder="https://project-demo.com"
+                      />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Technologies</label>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {project.technologies.map((tech, techIndex) => (
+                      <span key={techIndex} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {tech}
+                        <button
+                          type="button"
+                          onClick={() => removeTechnology(index, techIndex)}
+                          className="ml-1 text-blue-600 hover:text-blue-800"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-2 flex">
+                    <input
+                      type="text"
+                      value={newTechnology}
+                      onChange={(e) => setNewTechnology(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          addTechnology(index);
+                        }
+                      }}
+                      placeholder="Add a technology"
+                      className="flex-1 rounded-l-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => addTechnology(index)}
+                      className="px-3 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600"
+                    >
+                      Add
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
-          <Button
+        </div>
+
+        <div className="flex justify-between">
+          <button
             type="button"
-            variant="outline"
-            onClick={() => {
-              const currentProjects = form.getValues('projects') || []
-              form.setValue('projects', [
-                ...currentProjects,
-                {
-                  name: '',
-                  description: '',
-                  technologies: [],
-                },
-              ])
-            }}
+            onClick={addProject}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
             Add Project
-          </Button>
-        </div>
-        <div className="space-y-2">
-          <Button 
-            type="submit" 
-            className="w-full"
+          </button>
+          <button
+            type="submit"
             disabled={isSubmitting}
+            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
-          </Button>
-          {submitSuccess && (
-            <p className="text-sm text-green-500 text-center">
-              Changes saved successfully!
-            </p>
-          )}
-          {error && (
-            <p className="text-sm text-red-500 text-center">
-              {error}
-            </p>
-          )}
+          </button>
         </div>
+
+        {submitSuccess && (
+          <p className="text-green-600">Changes saved successfully!</p>
+        )}
+        {error && (
+          <p className="text-red-600">{error}</p>
+        )}
       </form>
     )
   }
