@@ -110,6 +110,66 @@ export function ResumePreview() {
             ))}
           </div>
         )}
+
+        {resume.skills.length > 0 && (
+          <div className="space-y-4">
+            <h4 className="font-medium text-gray-900">Skills</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {resume.skills.map((skill, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-gray-800">{skill.name}</span>
+                    {skill.proficiency !== undefined && (
+                      <span className="text-sm text-gray-600">{skill.proficiency}%</span>
+                    )}
+                  </div>
+                  {skill.proficiency !== undefined && (
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className="bg-blue-600 h-2.5 rounded-full" 
+                        style={{ width: `${skill.proficiency}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {resume.certifications.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-xl font-bold">Certifications</h2>
+            <div className="mt-2 space-y-2">
+              {resume.certifications.map((cert, index) => (
+                <div key={index} className="flex justify-between">
+                  <div>
+                    <h3 className="font-semibold">{cert.title}</h3>
+                    <p className="text-gray-600">{cert.issuer}</p>
+                  </div>
+                  <p className="text-gray-600">{cert.issueDate}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {resume.awards.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-xl font-bold">Awards</h2>
+            <div className="mt-2 space-y-2">
+              {resume.awards.map((award, index) => (
+                <div key={index} className="flex justify-between">
+                  <div>
+                    <h3 className="font-semibold">{award.title}</h3>
+                    <p className="text-gray-600">{award.institution}</p>
+                  </div>
+                  <p className="text-gray-600">{award.date}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

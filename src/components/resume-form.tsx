@@ -11,11 +11,11 @@ import { Label } from '@/components/ui/label'
 import { useState, useEffect } from 'react'
 
 interface ResumeFormProps {
-  section: 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'projects'
+  section: 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'awards'
 }
 
 export function ResumeForm({ section }: ResumeFormProps) {
-  const { resume, updateContact, updateSummary, updateExperience, updateEducation, updateSkills, updateProjects } = useResumeStore()
+  const { resume, updateContact, updateSummary, updateExperience, updateEducation, updateSkills, updateProjects, updateCertifications, updateAwards } = useResumeStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -53,6 +53,26 @@ export function ResumeForm({ section }: ResumeFormProps) {
   }>>([]);
 
   const [newTechnology, setNewTechnology] = useState('');
+
+  const [skills, setSkills] = useState<Array<{
+    name: string;
+    proficiency?: number;
+  }>>([]);
+
+  const [newSkill, setNewSkill] = useState('');
+  const [newProficiency, setNewProficiency] = useState('');
+
+  const [certifications, setCertifications] = useState<Array<{
+    title: string;
+    issuer: string;
+    issueDate: string;
+  }>>([]);
+
+  const [awards, setAwards] = useState<Array<{
+    title: string;
+    institution: string;
+    date: string;
+  }>>([]);
 
   const addExperience = () => {
     setExperiences([...experiences, {
@@ -97,7 +117,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
   const handleExperienceSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateExperience(experiences);
-    setIsSubmitting(true);
+    setIsSubmitting(false);
     setSubmitSuccess(true);
     setTimeout(() => setSubmitSuccess(false), 3000);
   };
@@ -130,7 +150,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
   const handleEducationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateEducation(educations);
-    setIsSubmitting(true);
+    setIsSubmitting(false);
     setSubmitSuccess(true);
     setTimeout(() => setSubmitSuccess(false), 3000);
   };
@@ -178,7 +198,97 @@ export function ResumeForm({ section }: ResumeFormProps) {
   const handleProjectSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateProjects(projects);
-    setIsSubmitting(true);
+    setIsSubmitting(false);
+    setSubmitSuccess(true);
+    setTimeout(() => setSubmitSuccess(false), 3000);
+  };
+
+  const addSkill = () => {
+    if (newSkill.trim()) {
+      setSkills([...skills, {
+        name: newSkill.trim(),
+        proficiency: newProficiency ? parseInt(newProficiency) : undefined
+      }]);
+      setNewSkill('');
+      setNewProficiency('');
+    }
+  };
+
+  const removeSkill = (index: number) => {
+    setSkills(skills.filter((_, i) => i !== index));
+  };
+
+  const handleSkillChange = (index: number, field: string, value: string | number) => {
+    const updatedSkills = [...skills];
+    updatedSkills[index] = {
+      ...updatedSkills[index],
+      [field]: value
+    };
+    setSkills(updatedSkills);
+  };
+
+  const handleSkillsSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSkills(skills);
+    setIsSubmitting(false);
+    setSubmitSuccess(true);
+    setTimeout(() => setSubmitSuccess(false), 3000);
+  };
+
+  const addCertification = () => {
+    setCertifications([...certifications, {
+      title: '',
+      issuer: '',
+      issueDate: ''
+    }]);
+  };
+
+  const removeCertification = (index: number) => {
+    setCertifications(certifications.filter((_, i) => i !== index));
+  };
+
+  const handleCertificationChange = (index: number, field: string, value: string) => {
+    const updatedCertifications = [...certifications];
+    updatedCertifications[index] = {
+      ...updatedCertifications[index],
+      [field]: value
+    };
+    setCertifications(updatedCertifications);
+  };
+
+  const handleCertificationSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateCertifications(certifications);
+    setIsSubmitting(false);
+    setSubmitSuccess(true);
+    setTimeout(() => setSubmitSuccess(false), 3000);
+  };
+
+  const addAward = () => {
+    setAwards([...awards, {
+      title: '',
+      institution: '',
+      date: ''
+    }]);
+  };
+
+  const removeAward = (index: number) => {
+    setAwards(awards.filter((_, i) => i !== index));
+  };
+
+  const handleAwardChange = (index: number, field: string, value: string) => {
+    const updatedAwards = [...awards];
+    updatedAwards[index] = {
+      ...updatedAwards[index],
+      [field]: value
+    };
+    setAwards(updatedAwards);
+  };
+
+  const handleAwardSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateAwards(awards);
+    setIsSubmitting(false);
     setSubmitSuccess(true);
     setTimeout(() => setSubmitSuccess(false), 3000);
   };
@@ -193,121 +303,133 @@ export function ResumeForm({ section }: ResumeFormProps) {
     defaultValues: resume,
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Form submitted')
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = form.getValues();
+    console.log('Form submitted:', formData);
     
-    try {
-      setIsSubmitting(true)
-      setError(null)
-      
-      const formData = form.getValues()
-      console.log('Form data:', formData)
-      
-      if (section === 'contact') {
-        console.log('Updating contact:', formData.contact)
-        updateContact(formData.contact)
-      } else if (section === 'summary') {
-        console.log('Updating summary:', formData.summary)
-        updateSummary(formData.summary)
-      } else if (section === 'experience') {
-        console.log('Updating experience:', formData.experience)
-        updateExperience(formData.experience)
-      } else if (section === 'education') {
-        console.log('Updating education:', formData.education)
-        updateEducation(formData.education)
-      } else if (section === 'skills') {
-        console.log('Updating skills:', formData.skills)
-        updateSkills(formData.skills)
-      } else if (section === 'projects') {
-        console.log('Updating projects:', formData.projects)
-        updateProjects(formData.projects)
-      }
-      
-      setSubmitSuccess(true)
-      setTimeout(() => setSubmitSuccess(false), 3000)
-    } catch (error) {
-      console.error('Error saving form:', error)
-      setError('Failed to save changes. Please try again.')
-    } finally {
-      setIsSubmitting(false)
+    if (section === 'contact') {
+      updateContact(formData.contact);
+    } else if (section === 'summary') {
+      updateSummary(formData.summary);
     }
-  }
+    
+    setIsSubmitting(false);
+    setSubmitSuccess(true);
+    setTimeout(() => setSubmitSuccess(false), 3000);
+  };
 
   if (section === 'contact') {
     return (
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input
-              id="name"
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Profile Picture</label>
+            <div className="mt-1 flex items-center space-x-4">
+              {form.watch('contact.profilePicture') ? (
+                <img
+                  src={form.watch('contact.profilePicture')}
+                  alt="Profile"
+                  className="h-20 w-20 rounded-full object-cover"
+                />
+              ) : (
+                <div className="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center">
+                  <span className="text-gray-400">No image</span>
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      form.setValue('contact.profilePicture', reader.result as string);
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Full Name</label>
+            <input
+              type="text"
               {...form.register('contact.name')}
-              placeholder="John Doe"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              required
             />
-            {form.formState.errors.contact?.name && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.contact.name.message?.toString()}
-              </p>
-            )}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="title">Professional Title</Label>
-            <Input
-              id="title"
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Title</label>
+            <input
+              type="text"
               {...form.register('contact.title')}
-              placeholder="Software Engineer"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              required
             />
-            {form.formState.errors.contact?.title && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.contact.title.message?.toString()}
-              </p>
-            )}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <input
               type="email"
               {...form.register('contact.email')}
-              placeholder="john@example.com"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              required
             />
-            {form.formState.errors.contact?.email && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.contact.email.message?.toString()}
-              </p>
-            )}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Phone</label>
+            <input
+              type="tel"
               {...form.register('contact.phone')}
-              placeholder="+1 (555) 000-0000"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              required
             />
-            {form.formState.errors.contact?.phone && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.contact.phone.message?.toString()}
-              </p>
-            )}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
-            <Input
-              id="location"
-              {...form.register('contact.location')}
-              placeholder="City, Country"
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Website</label>
+            <input
+              type="url"
+              {...form.register('contact.website')}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              placeholder="https://your-website.com"
             />
-            {form.formState.errors.contact?.location && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.contact.location.message?.toString()}
-              </p>
-            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">LinkedIn</label>
+            <input
+              type="url"
+              {...form.register('contact.linkedin')}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              placeholder="https://linkedin.com/in/your-profile"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">GitHub</label>
+            <input
+              type="url"
+              {...form.register('contact.github')}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              placeholder="https://github.com/your-username"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Location</label>
+            <input
+              type="text"
+              {...form.register('contact.location')}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              required
+            />
           </div>
         </div>
         <div className="space-y-2">
           <Button 
-            type="submit" 
+            type="submit"
             className="w-full"
             disabled={isSubmitting}
           >
@@ -632,84 +754,109 @@ export function ResumeForm({ section }: ResumeFormProps) {
 
   if (section === 'skills') {
     return (
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSkillsSubmit} className="space-y-6">
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Skills</Label>
-            <div className="flex flex-wrap gap-2">
-              {resume.skills.map((skill, index) => (
-                <div key={index} className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
-                  <span>{skill}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const currentSkills = form.getValues('skills') || []
-                      form.setValue(
-                        'skills',
-                        currentSkills.filter((_, i) => i !== index)
-                      )
-                    }}
-                    className="text-gray-500 hover:text-gray-700"
-                  >
-                    ×
-                  </button>
+          {skills.map((skill, index) => (
+            <div key={index} className="p-4 border rounded-lg space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Skill {index + 1}</h3>
+                <button
+                  type="button"
+                  onClick={() => removeSkill(index)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  Remove
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Skill Name</label>
+                  <input
+                    type="text"
+                    value={skill.name}
+                    onChange={(e) => handleSkillChange(index, 'name', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
+                  />
                 </div>
-              ))}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Proficiency (Optional)</label>
+                  <div className="mt-1 flex items-center space-x-2">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={skill.proficiency || 0}
+                      onChange={(e) => handleSkillChange(index, 'proficiency', parseInt(e.target.value))}
+                      className="flex-1"
+                    />
+                    <span className="text-sm text-gray-600 w-12 text-right">
+                      {skill.proficiency || 0}%
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <Input
-              id="newSkill"
-              placeholder="Add a skill"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  const input = e.target as HTMLInputElement
-                  const newSkill = input.value.trim()
-                  if (newSkill) {
-                    const currentSkills = form.getValues('skills') || []
-                    form.setValue('skills', [...currentSkills, newSkill])
-                    input.value = ''
+          ))}
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-end space-x-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700">New Skill</label>
+              <input
+                type="text"
+                value={newSkill}
+                onChange={(e) => setNewSkill(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addSkill();
                   }
-                }
-              }}
-            />
-            <Button
+                }}
+                placeholder="Enter skill name"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              />
+            </div>
+            <div className="w-32">
+              <label className="block text-sm font-medium text-gray-700">Proficiency</label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={newProficiency}
+                onChange={(e) => setNewProficiency(e.target.value)}
+                placeholder="0-100"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              />
+            </div>
+            <button
               type="button"
-              variant="outline"
-              onClick={() => {
-                const input = document.getElementById('newSkill') as HTMLInputElement
-                const newSkill = input.value.trim()
-                if (newSkill) {
-                  const currentSkills = form.getValues('skills') || []
-                  form.setValue('skills', [...currentSkills, newSkill])
-                  input.value = ''
-                }
-              }}
+              onClick={addSkill}
+              className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
             >
               Add
-            </Button>
+            </button>
           </div>
         </div>
-        <div className="space-y-2">
-          <Button 
-            type="submit" 
-            className="w-full"
+
+        <div className="flex justify-end">
+          <button
+            type="submit"
             disabled={isSubmitting}
+            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
-          </Button>
-          {submitSuccess && (
-            <p className="text-sm text-green-500 text-center">
-              Changes saved successfully!
-            </p>
-          )}
-          {error && (
-            <p className="text-sm text-red-500 text-center">
-              {error}
-            </p>
-          )}
+          </button>
         </div>
+
+        {submitSuccess && (
+          <p className="text-green-600">Changes saved successfully!</p>
+        )}
+        {error && (
+          <p className="text-red-600">{error}</p>
+        )}
       </form>
     )
   }
@@ -849,6 +996,166 @@ export function ResumeForm({ section }: ResumeFormProps) {
             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
             Add Project
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
+          >
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
+
+        {submitSuccess && (
+          <p className="text-green-600">Changes saved successfully!</p>
+        )}
+        {error && (
+          <p className="text-red-600">{error}</p>
+        )}
+      </form>
+    )
+  }
+
+  if (section === 'certifications') {
+    return (
+      <form onSubmit={handleCertificationSubmit} className="space-y-6">
+        <div className="space-y-4">
+          {certifications.map((certification, index) => (
+            <div key={index} className="p-4 border rounded-lg space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Certification {index + 1}</h3>
+                <button
+                  type="button"
+                  onClick={() => removeCertification(index)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  Remove
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Title</label>
+                  <input
+                    type="text"
+                    value={certification.title}
+                    onChange={(e) => handleCertificationChange(index, 'title', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Issuer</label>
+                  <input
+                    type="text"
+                    value={certification.issuer}
+                    onChange={(e) => handleCertificationChange(index, 'issuer', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Issue Date</label>
+                  <input
+                    type="date"
+                    value={certification.issueDate}
+                    onChange={(e) => handleCertificationChange(index, 'issueDate', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-between">
+          <button
+            type="button"
+            onClick={addCertification}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
+            Add Certification
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
+          >
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
+
+        {submitSuccess && (
+          <p className="text-green-600">Changes saved successfully!</p>
+        )}
+        {error && (
+          <p className="text-red-600">{error}</p>
+        )}
+      </form>
+    )
+  }
+
+  if (section === 'awards') {
+    return (
+      <form onSubmit={handleAwardSubmit} className="space-y-6">
+        <div className="space-y-4">
+          {awards.map((award, index) => (
+            <div key={index} className="p-4 border rounded-lg space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Award {index + 1}</h3>
+                <button
+                  type="button"
+                  onClick={() => removeAward(index)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  Remove
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Title</label>
+                  <input
+                    type="text"
+                    value={award.title}
+                    onChange={(e) => handleAwardChange(index, 'title', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Institution</label>
+                  <input
+                    type="text"
+                    value={award.institution}
+                    onChange={(e) => handleAwardChange(index, 'institution', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Date</label>
+                  <input
+                    type="date"
+                    value={award.date}
+                    onChange={(e) => handleAwardChange(index, 'date', e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-between">
+          <button
+            type="button"
+            onClick={addAward}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
+            Add Award
           </button>
           <button
             type="submit"
