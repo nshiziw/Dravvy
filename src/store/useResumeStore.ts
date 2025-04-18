@@ -7,7 +7,6 @@ type Contact = {
   email: string;
   phone: string;
   location: string;
-  profilePicture?: string;
   website?: string;
   linkedin?: string;
   github?: string;
@@ -78,6 +77,16 @@ type Reference = {
   phone: string;
 }
 
+type Styling = {
+  showSkillProficiency: boolean;
+  fontFamily: string;
+  dateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'Month DD, YYYY' | 'DD Month YYYY';
+  sectionDivider: {
+    type: 'none' | 'line' | 'double-line' | 'dashes';
+    color: string;
+  };
+}
+
 export type Resume = {
   contact: Contact;
   summary: string;
@@ -96,6 +105,7 @@ export type Resume = {
 type ResumeStore = {
   resume: Resume
   activeSection: number
+  styling: Styling
   updateContact: (contact: Contact) => void
   updateSummary: (summary: string) => void
   updateExperience: (experience: Experience[]) => void
@@ -112,6 +122,17 @@ type ResumeStore = {
   updateVolunteer: (volunteer: Volunteer[]) => void
   updateReferences: (references: Reference[]) => void
   setActiveSection: (section: number) => void
+  updateStyling: (styling: Partial<Styling>) => void
+}
+
+const initialStyling: Styling = {
+  showSkillProficiency: true,
+  fontFamily: 'Arial',
+  dateFormat: 'Month DD, YYYY',
+  sectionDivider: {
+    type: 'line',
+    color: '#000000',
+  },
 }
 
 const initialResume: Resume = {
@@ -140,6 +161,7 @@ export const useResumeStore = create<ResumeStore>()(
     (set) => ({
       resume: initialResume,
       activeSection: 0,
+      styling: initialStyling,
       updateContact: (contact) => set((state) => ({ resume: { ...state.resume, contact } })),
       updateSummary: (summary) => set((state) => ({ resume: { ...state.resume, summary } })),
       updateExperience: (experience) => set((state) => ({ resume: { ...state.resume, experience } })),
@@ -153,6 +175,7 @@ export const useResumeStore = create<ResumeStore>()(
       updateVolunteer: (volunteer) => set((state) => ({ resume: { ...state.resume, volunteer } })),
       updateReferences: (references) => set((state) => ({ resume: { ...state.resume, references } })),
       setActiveSection: (section) => set({ activeSection: section }),
+      updateStyling: (styling) => set((state) => ({ styling: { ...state.styling, ...styling } })),
     }),
     {
       name: 'resume-storage',

@@ -9,9 +9,10 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { useState, useEffect } from 'react'
+import { StylingForm } from './styling-form'
 
 interface ResumeFormProps {
-  section: 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'awards'
+  section: 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'awards' | 'styling'
 }
 
 const inputStyles = "w-full px-4 py-2.5 text-gray-700 bg-white border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 ease-in-out placeholder-gray-400 outline-none"
@@ -327,41 +328,14 @@ export function ResumeForm({ section }: ResumeFormProps) {
     setTimeout(() => setSubmitSuccess(false), 3000);
   };
 
+  if (section === 'styling') {
+    return <StylingForm />
+  }
+
   if (section === 'contact') {
     return (
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
-          <div>
-            <label className={labelStyles}>Profile Picture</label>
-            <div className="mt-1 flex items-center space-x-4">
-              {form.watch('contact.profilePicture') ? (
-                <img
-                  src={form.watch('contact.profilePicture')}
-                  alt="Profile"
-                  className="h-20 w-20 rounded-full object-cover ring-2 ring-gray-200"
-                />
-              ) : (
-                <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center ring-2 ring-gray-200">
-                  <span className="text-gray-400">No image</span>
-                </div>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                      form.setValue('contact.profilePicture', reader.result as string);
-                    };
-                    reader.readAsDataURL(file);
-                  }
-                }}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors duration-200"
-              />
-            </div>
-          </div>
           <div>
             <label className={labelStyles}>Full Name</label>
             <input
@@ -1202,6 +1176,10 @@ export function ResumeForm({ section }: ResumeFormProps) {
         )}
       </form>
     )
+  }
+
+  if (section === 'styling') {
+    return <StylingForm />
   }
 
   return null

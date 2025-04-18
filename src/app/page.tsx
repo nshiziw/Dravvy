@@ -64,8 +64,6 @@ export default function Home() {
             </h2>
             {sections[activeSection].id === 'preview' ? (
               <ResumePreview />
-            ) : sections[activeSection].id === 'styling' ? (
-              <div>Styling options will go here</div>
             ) : (
               <ResumeForm section={sections[activeSection].id} />
             )}
