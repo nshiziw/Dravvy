@@ -85,6 +85,7 @@ type Styling = {
     type: 'none' | 'line' | 'double-line' | 'dashes';
     color: string;
   };
+  showLinks: boolean;
 }
 
 export type Resume = {
@@ -133,6 +134,7 @@ const initialStyling: Styling = {
     type: 'line',
     color: '#000000',
   },
+  showLinks: true,
 }
 
 const initialResume: Resume = {

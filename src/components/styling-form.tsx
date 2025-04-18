@@ -49,6 +49,16 @@ export function StylingForm() {
   const [previewText, setPreviewText] = useState(
     "The quick brown fox jumps over the lazy dog"
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const handleSaveStyles = () => {
+    setIsSubmitting(true);
+    // The styles are already being saved in real-time, but we'll add a success message
+    setSubmitSuccess(true);
+    setIsSubmitting(false);
+    setTimeout(() => setSubmitSuccess(false), 3000);
+  };
 
   return (
     <div className="space-y-6">
@@ -61,6 +71,18 @@ export function StylingForm() {
             checked={styling.showSkillProficiency}
             onCheckedChange={(checked) =>
               updateStyling({ showSkillProficiency: checked })
+            }
+          />
+        </div>
+
+        {/* Show Links Toggle */}
+        <div className="flex items-center justify-between">
+          <Label htmlFor="show-links">Show Links</Label>
+          <Switch
+            id="show-links"
+            checked={styling.showLinks}
+            onCheckedChange={(checked) =>
+              updateStyling({ showLinks: checked })
             }
           />
         </div>
@@ -228,6 +250,23 @@ export function StylingForm() {
           </div>
         </div>
       </div>
+      
+      {/* Save Button */}
+      <div className="flex justify-end pt-4 border-t">
+        <Button
+          onClick={handleSaveStyles}
+          disabled={isSubmitting}
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? 'Saving...' : 'Save Styles'}
+        </Button>
+      </div>
+      
+      {submitSuccess && (
+        <p className="text-sm text-green-600 text-center">
+          Styles saved successfully! The preview will reflect these changes.
+        </p>
+      )}
     </div>
   );
 }
