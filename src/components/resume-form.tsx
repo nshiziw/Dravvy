@@ -14,6 +14,22 @@ interface ResumeFormProps {
   section: 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'awards'
 }
 
+const inputStyles = "w-full px-4 py-2.5 text-gray-700 bg-white border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 ease-in-out placeholder-gray-400 outline-none"
+const textareaStyles = "w-full px-4 py-3 text-gray-700 bg-white border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 ease-in-out placeholder-gray-400 resize-none outline-none"
+const labelStyles = "block text-sm font-medium text-gray-700 mb-1.5"
+const checkboxStyles = "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors duration-200 outline-none"
+const buttonStyles = "px-4 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+
+type Project = {
+  name: string;
+  description: string;
+  technologies: string[];
+  githubLink?: string;
+  demoLink?: string;
+  hasGithubLink: boolean;
+  hasDemoLink: boolean;
+}
+
 export function ResumeForm({ section }: ResumeFormProps) {
   const { resume, updateContact, updateSummary, updateExperience, updateEducation, updateSkills, updateProjects, updateCertifications, updateAwards } = useResumeStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -42,15 +58,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
     isExpected: boolean;
   }>>([]);
 
-  const [projects, setProjects] = useState<Array<{
-    name: string;
-    description: string;
-    technologies: string[];
-    githubLink?: string;
-    demoLink?: string;
-    hasGithubLink: boolean;
-    hasDemoLink: boolean;
-  }>>([]);
+  const [projects, setProjects] = useState<Array<Project>>([]);
 
   const [newTechnology, setNewTechnology] = useState('');
 
@@ -171,7 +179,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
     setProjects(projects.filter((_, i) => i !== index));
   };
 
-  const handleProjectChange = (index: number, field: string, value: string | string[]) => {
+  const handleProjectChange = (index: number, field: keyof Project, value: string | string[] | boolean) => {
     const updatedProjects = [...projects];
     updatedProjects[index] = {
       ...updatedProjects[index],
@@ -324,16 +332,16 @@ export function ResumeForm({ section }: ResumeFormProps) {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Profile Picture</label>
+            <label className={labelStyles}>Profile Picture</label>
             <div className="mt-1 flex items-center space-x-4">
               {form.watch('contact.profilePicture') ? (
                 <img
                   src={form.watch('contact.profilePicture')}
                   alt="Profile"
-                  className="h-20 w-20 rounded-full object-cover"
+                  className="h-20 w-20 rounded-full object-cover ring-2 ring-gray-200"
                 />
               ) : (
-                <div className="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center">
+                <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center ring-2 ring-gray-200">
                   <span className="text-gray-400">No image</span>
                 </div>
               )}
@@ -350,79 +358,79 @@ export function ResumeForm({ section }: ResumeFormProps) {
                     reader.readAsDataURL(file);
                   }
                 }}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors duration-200"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
+            <label className={labelStyles}>Full Name</label>
             <input
               type="text"
               {...form.register('contact.name')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              className={inputStyles}
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Title</label>
+            <label className={labelStyles}>Title</label>
             <input
               type="text"
               {...form.register('contact.title')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              className={inputStyles}
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className={labelStyles}>Email</label>
             <input
               type="email"
               {...form.register('contact.email')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              className={inputStyles}
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Phone</label>
+            <label className={labelStyles}>Phone</label>
             <input
               type="tel"
               {...form.register('contact.phone')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              className={inputStyles}
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Website</label>
+            <label className={labelStyles}>Website</label>
             <input
               type="url"
               {...form.register('contact.website')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              className={inputStyles}
               placeholder="https://your-website.com"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">LinkedIn</label>
+            <label className={labelStyles}>LinkedIn</label>
             <input
               type="url"
               {...form.register('contact.linkedin')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              className={inputStyles}
               placeholder="https://linkedin.com/in/your-profile"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">GitHub</label>
+            <label className={labelStyles}>GitHub</label>
             <input
               type="url"
               {...form.register('contact.github')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              className={inputStyles}
               placeholder="https://github.com/your-username"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Location</label>
+            <label className={labelStyles}>Location</label>
             <input
               type="text"
               {...form.register('contact.location')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+              className={inputStyles}
               required
             />
           </div>
@@ -430,7 +438,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
         <div className="space-y-2">
           <Button 
             type="submit"
-            className="w-full"
+            className={buttonStyles}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
@@ -454,12 +462,13 @@ export function ResumeForm({ section }: ResumeFormProps) {
     return (
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="summary">Summary</Label>
+          <Label htmlFor="summary" className={labelStyles}>Summary</Label>
           <Textarea
             id="summary"
             {...form.register('summary')}
             placeholder="Write a brief summary of your professional experience..."
             rows={4}
+            className={textareaStyles}
           />
           {form.formState.errors.summary && (
             <p className="text-sm text-red-500">
@@ -470,7 +479,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
         <div className="space-y-2">
           <Button 
             type="submit" 
-            className="w-full"
+            className={buttonStyles}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
@@ -495,13 +504,13 @@ export function ResumeForm({ section }: ResumeFormProps) {
       <form onSubmit={handleExperienceSubmit} className="space-y-6">
         <div className="space-y-4">
           {experiences.map((exp, index) => (
-            <div key={index} className="p-4 border rounded-lg space-y-4">
+            <div key={index} className="p-6 border border-gray-200 rounded-lg space-y-4 bg-white shadow-sm">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Experience {index + 1}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Experience {index + 1}</h3>
                 <button
                   type="button"
                   onClick={() => removeExperience(index)}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-red-700 text-sm font-medium"
                 >
                   Remove
                 </button>
@@ -509,53 +518,53 @@ export function ResumeForm({ section }: ResumeFormProps) {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Job Title</label>
+                  <label className={labelStyles}>Job Title</label>
                   <input
                     type="text"
                     value={exp.jobTitle}
                     onChange={(e) => handleExperienceChange(index, 'jobTitle', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Company Name</label>
+                  <label className={labelStyles}>Company Name</label>
                   <input
                     type="text"
                     value={exp.company}
                     onChange={(e) => handleExperienceChange(index, 'company', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Location</label>
+                  <label className={labelStyles}>Location</label>
                   <input
                     type="text"
                     value={exp.location}
                     onChange={(e) => handleExperienceChange(index, 'location', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                  <label className={labelStyles}>Start Date</label>
                   <input
                     type="date"
                     value={exp.startDate}
                     onChange={(e) => handleExperienceChange(index, 'startDate', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">End Date</label>
+                  <label className={labelStyles}>End Date</label>
                   <div className="flex items-center space-x-2">
                     <input
                       type="date"
                       value={exp.endDate}
                       onChange={(e) => handleExperienceChange(index, 'endDate', e.target.value)}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                      className={inputStyles}
                       disabled={exp.isPresent}
                     />
                     <div className="flex items-center">
@@ -563,7 +572,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
                         type="checkbox"
                         checked={exp.isPresent}
                         onChange={(e) => handleExperienceChange(index, 'isPresent', e.target.checked)}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className={checkboxStyles}
                       />
                       <label className="ml-2 block text-sm text-gray-700">Present</label>
                     </div>
@@ -572,16 +581,16 @@ export function ResumeForm({ section }: ResumeFormProps) {
               </div>
 
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700">Description Points</label>
+                <label className={labelStyles}>Description Points</label>
                 <div className="mt-2 space-y-2">
                   {exp.description.map((point, descIndex) => (
-                    <div key={descIndex} className="flex items-center space-x-2">
+                    <div key={descIndex} className="flex items-center space-x-2 bg-gray-50 p-2 rounded-lg">
                       <span className="text-gray-500">•</span>
-                      <span className="flex-grow">{point}</span>
+                      <span className="flex-grow text-gray-900">{point}</span>
                       <button
                         type="button"
                         onClick={() => removeDescriptionPoint(index, descIndex)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-red-500 hover:text-red-700 text-sm"
                       >
                         Remove
                       </button>
@@ -594,12 +603,12 @@ export function ResumeForm({ section }: ResumeFormProps) {
                         value={newDescription}
                         onChange={(e) => setNewDescription(e.target.value)}
                         placeholder="Add a description point"
-                        className="flex-grow rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                        className={inputStyles}
                       />
                       <button
                         type="button"
                         onClick={() => addDescriptionPoint(index)}
-                        className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                        className={buttonStyles}
                       >
                         Add
                       </button>
@@ -618,14 +627,14 @@ export function ResumeForm({ section }: ResumeFormProps) {
           <button
             type="button"
             onClick={addExperience}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            className={buttonStyles}
           >
             Add Experience
           </button>
           <button
             type="submit"
             disabled={isSubmitting || experiences.some(exp => exp.description.length < 2)}
-            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
+            className={buttonStyles}
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
@@ -646,13 +655,13 @@ export function ResumeForm({ section }: ResumeFormProps) {
       <form onSubmit={handleEducationSubmit} className="space-y-6">
         <div className="space-y-4">
           {educations.map((edu, index) => (
-            <div key={index} className="p-4 border rounded-lg space-y-4">
+            <div key={index} className="p-6 border border-gray-200 rounded-lg space-y-4 bg-white shadow-sm">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Education {index + 1}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Education {index + 1}</h3>
                 <button
                   type="button"
                   onClick={() => removeEducation(index)}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-red-700 text-sm font-medium"
                 >
                   Remove
                 </button>
@@ -660,54 +669,54 @@ export function ResumeForm({ section }: ResumeFormProps) {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Degree</label>
+                  <label className={labelStyles}>Degree</label>
                   <input
                     type="text"
                     value={edu.degree}
                     onChange={(e) => handleEducationChange(index, 'degree', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Institution</label>
+                  <label className={labelStyles}>Institution</label>
                   <input
                     type="text"
                     value={edu.institution}
                     onChange={(e) => handleEducationChange(index, 'institution', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Location</label>
+                  <label className={labelStyles}>Location</label>
                   <input
                     type="text"
                     value={edu.location}
                     onChange={(e) => handleEducationChange(index, 'location', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                  <label className={labelStyles}>Start Date</label>
                   <input
                     type="date"
                     value={edu.startDate}
                     onChange={(e) => handleEducationChange(index, 'startDate', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className={labelStyles}>
                     {edu.isExpected ? 'Expected Date' : 'End Date'}
                   </label>
                   <input
                     type="date"
                     value={edu.isExpected ? edu.expectedDate : edu.endDate}
                     onChange={(e) => handleEducationChange(index, edu.isExpected ? 'expectedDate' : 'endDate', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
@@ -716,7 +725,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
                     type="checkbox"
                     checked={edu.isExpected}
                     onChange={(e) => handleEducationChange(index, 'isExpected', e.target.checked)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className={checkboxStyles}
                   />
                   <label className="ml-2 block text-sm text-gray-700">Expected</label>
                 </div>
@@ -729,14 +738,14 @@ export function ResumeForm({ section }: ResumeFormProps) {
           <button
             type="button"
             onClick={addEducation}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            className={buttonStyles}
           >
             Add Education
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
+            className={buttonStyles}
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
@@ -757,13 +766,13 @@ export function ResumeForm({ section }: ResumeFormProps) {
       <form onSubmit={handleSkillsSubmit} className="space-y-6">
         <div className="space-y-4">
           {skills.map((skill, index) => (
-            <div key={index} className="p-4 border rounded-lg space-y-4">
+            <div key={index} className="p-6 border border-gray-200 rounded-lg space-y-4 bg-white shadow-sm">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Skill {index + 1}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Skill {index + 1}</h3>
                 <button
                   type="button"
                   onClick={() => removeSkill(index)}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-red-700 text-sm font-medium"
                 >
                   Remove
                 </button>
@@ -771,29 +780,40 @@ export function ResumeForm({ section }: ResumeFormProps) {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Skill Name</label>
+                  <label className={labelStyles}>Skill Name</label>
                   <input
                     type="text"
                     value={skill.name}
                     onChange={(e) => handleSkillChange(index, 'name', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Proficiency (Optional)</label>
-                  <div className="mt-1 flex items-center space-x-2">
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={skill.proficiency || 0}
-                      onChange={(e) => handleSkillChange(index, 'proficiency', parseInt(e.target.value))}
-                      className="flex-1"
-                    />
-                    <span className="text-sm text-gray-600 w-12 text-right">
-                      {skill.proficiency || 0}%
-                    </span>
+                  <label className={labelStyles}>Proficiency (Optional)</label>
+                  <div className="mt-1 flex items-center space-x-4">
+                    <div className="flex-1">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={skill.proficiency || 0}
+                        onChange={(e) => handleSkillChange(index, 'proficiency', parseInt(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-blue-500 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-200 [&::-webkit-slider-thumb]:hover:scale-110"
+                        style={{
+                          background: `linear-gradient(to right, #3b82f6 ${skill.proficiency || 0}%, #e5e7eb ${skill.proficiency || 0}%)`
+                        }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-center w-16 h-8 bg-blue-50 rounded-lg">
+                      <span className="text-sm font-medium text-blue-600">
+                        {skill.proficiency || 0}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-1 flex justify-between text-xs text-gray-500">
+                    <span>Beginner</span>
+                    <span>Expert</span>
                   </div>
                 </div>
               </div>
@@ -804,7 +824,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
         <div className="space-y-4">
           <div className="flex items-end space-x-4">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700">New Skill</label>
+              <label className={labelStyles}>New Skill</label>
               <input
                 type="text"
                 value={newSkill}
@@ -816,25 +836,30 @@ export function ResumeForm({ section }: ResumeFormProps) {
                   }
                 }}
                 placeholder="Enter skill name"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                className={inputStyles}
               />
             </div>
             <div className="w-32">
-              <label className="block text-sm font-medium text-gray-700">Proficiency</label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={newProficiency}
-                onChange={(e) => setNewProficiency(e.target.value)}
-                placeholder="0-100"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
-              />
+              <label className={labelStyles}>Proficiency</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={newProficiency}
+                  onChange={(e) => setNewProficiency(e.target.value)}
+                  placeholder="0-100"
+                  className={inputStyles}
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                  %
+                </div>
+              </div>
             </div>
             <button
               type="button"
               onClick={addSkill}
-              className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              className={buttonStyles}
             >
               Add
             </button>
@@ -845,7 +870,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
+            className={buttonStyles}
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
@@ -866,13 +891,13 @@ export function ResumeForm({ section }: ResumeFormProps) {
       <form onSubmit={handleProjectSubmit} className="space-y-6">
         <div className="space-y-4">
           {projects.map((project, index) => (
-            <div key={index} className="p-4 border rounded-lg space-y-4">
+            <div key={index} className="p-6 border border-gray-200 rounded-lg space-y-4 bg-white shadow-sm">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Project {index + 1}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Project {index + 1}</h3>
                 <button
                   type="button"
                   onClick={() => removeProject(index)}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-red-700 text-sm font-medium"
                 >
                   Remove
                 </button>
@@ -880,21 +905,21 @@ export function ResumeForm({ section }: ResumeFormProps) {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Project Name</label>
+                  <label className={labelStyles}>Project Name</label>
                   <input
                     type="text"
                     value={project.name}
                     onChange={(e) => handleProjectChange(index, 'name', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Description</label>
+                  <label className={labelStyles}>Description</label>
                   <textarea
                     value={project.description}
                     onChange={(e) => handleProjectChange(index, 'description', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={textareaStyles}
                     rows={3}
                     required
                   />
@@ -905,18 +930,18 @@ export function ResumeForm({ section }: ResumeFormProps) {
                       type="checkbox"
                       checked={project.hasGithubLink}
                       onChange={(e) => handleProjectChange(index, 'hasGithubLink', e.target.checked)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className={checkboxStyles}
                     />
                     <label className="ml-2 block text-sm text-gray-700">Include GitHub Link</label>
                   </div>
                   {project.hasGithubLink && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">GitHub Link</label>
+                      <label className={labelStyles}>GitHub Link</label>
                       <input
                         type="url"
                         value={project.githubLink}
                         onChange={(e) => handleProjectChange(index, 'githubLink', e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                        className={inputStyles}
                         placeholder="https://github.com/username/project"
                       />
                     </div>
@@ -928,33 +953,36 @@ export function ResumeForm({ section }: ResumeFormProps) {
                       type="checkbox"
                       checked={project.hasDemoLink}
                       onChange={(e) => handleProjectChange(index, 'hasDemoLink', e.target.checked)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className={checkboxStyles}
                     />
                     <label className="ml-2 block text-sm text-gray-700">Include Live Demo Link</label>
                   </div>
                   {project.hasDemoLink && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Live Demo Link</label>
+                      <label className={labelStyles}>Live Demo Link</label>
                       <input
                         type="url"
                         value={project.demoLink}
                         onChange={(e) => handleProjectChange(index, 'demoLink', e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                        className={inputStyles}
                         placeholder="https://project-demo.com"
                       />
                     </div>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Technologies</label>
+                  <label className={labelStyles}>Technologies</label>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {project.technologies.map((tech, techIndex) => (
-                      <span key={techIndex} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      <span 
+                        key={techIndex} 
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors duration-200"
+                      >
                         {tech}
                         <button
                           type="button"
                           onClick={() => removeTechnology(index, techIndex)}
-                          className="ml-1 text-blue-600 hover:text-blue-800"
+                          className="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none"
                         >
                           ×
                         </button>
@@ -973,12 +1001,12 @@ export function ResumeForm({ section }: ResumeFormProps) {
                         }
                       }}
                       placeholder="Add a technology"
-                      className="flex-1 rounded-l-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                      className={inputStyles}
                     />
                     <button
                       type="button"
                       onClick={() => addTechnology(index)}
-                      className="px-3 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600"
+                      className={buttonStyles}
                     >
                       Add
                     </button>
@@ -993,14 +1021,14 @@ export function ResumeForm({ section }: ResumeFormProps) {
           <button
             type="button"
             onClick={addProject}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            className={buttonStyles}
           >
             Add Project
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
+            className={buttonStyles}
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
@@ -1021,13 +1049,13 @@ export function ResumeForm({ section }: ResumeFormProps) {
       <form onSubmit={handleCertificationSubmit} className="space-y-6">
         <div className="space-y-4">
           {certifications.map((certification, index) => (
-            <div key={index} className="p-4 border rounded-lg space-y-4">
+            <div key={index} className="p-6 border border-gray-200 rounded-lg space-y-4 bg-white shadow-sm">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Certification {index + 1}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Certification {index + 1}</h3>
                 <button
                   type="button"
                   onClick={() => removeCertification(index)}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-red-700 text-sm font-medium"
                 >
                   Remove
                 </button>
@@ -1035,32 +1063,32 @@ export function ResumeForm({ section }: ResumeFormProps) {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Title</label>
+                  <label className={labelStyles}>Title</label>
                   <input
                     type="text"
                     value={certification.title}
                     onChange={(e) => handleCertificationChange(index, 'title', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Issuer</label>
+                  <label className={labelStyles}>Issuer</label>
                   <input
                     type="text"
                     value={certification.issuer}
                     onChange={(e) => handleCertificationChange(index, 'issuer', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Issue Date</label>
+                  <label className={labelStyles}>Issue Date</label>
                   <input
                     type="date"
                     value={certification.issueDate}
                     onChange={(e) => handleCertificationChange(index, 'issueDate', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
@@ -1073,14 +1101,14 @@ export function ResumeForm({ section }: ResumeFormProps) {
           <button
             type="button"
             onClick={addCertification}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            className={buttonStyles}
           >
             Add Certification
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
+            className={buttonStyles}
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
@@ -1101,13 +1129,13 @@ export function ResumeForm({ section }: ResumeFormProps) {
       <form onSubmit={handleAwardSubmit} className="space-y-6">
         <div className="space-y-4">
           {awards.map((award, index) => (
-            <div key={index} className="p-4 border rounded-lg space-y-4">
+            <div key={index} className="p-6 border border-gray-200 rounded-lg space-y-4 bg-white shadow-sm">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Award {index + 1}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Award {index + 1}</h3>
                 <button
                   type="button"
                   onClick={() => removeAward(index)}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-red-700 text-sm font-medium"
                 >
                   Remove
                 </button>
@@ -1115,32 +1143,32 @@ export function ResumeForm({ section }: ResumeFormProps) {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Title</label>
+                  <label className={labelStyles}>Title</label>
                   <input
                     type="text"
                     value={award.title}
                     onChange={(e) => handleAwardChange(index, 'title', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Institution</label>
+                  <label className={labelStyles}>Institution</label>
                   <input
                     type="text"
                     value={award.institution}
                     onChange={(e) => handleAwardChange(index, 'institution', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Date</label>
+                  <label className={labelStyles}>Date</label>
                   <input
                     type="date"
                     value={award.date}
                     onChange={(e) => handleAwardChange(index, 'date', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white"
+                    className={inputStyles}
                     required
                   />
                 </div>
@@ -1153,14 +1181,14 @@ export function ResumeForm({ section }: ResumeFormProps) {
           <button
             type="button"
             onClick={addAward}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            className={buttonStyles}
           >
             Add Award
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
+            className={buttonStyles}
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
