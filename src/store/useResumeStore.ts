@@ -95,6 +95,7 @@ export type Resume = {
 
 type ResumeStore = {
   resume: Resume
+  activeSection: number
   updateContact: (contact: Contact) => void
   updateSummary: (summary: string) => void
   updateExperience: (experience: Experience[]) => void
@@ -110,6 +111,7 @@ type ResumeStore = {
   updateProjects: (projects: Project[]) => void
   updateVolunteer: (volunteer: Volunteer[]) => void
   updateReferences: (references: Reference[]) => void
+  setActiveSection: (section: number) => void
 }
 
 const initialResume: Resume = {
@@ -137,6 +139,7 @@ export const useResumeStore = create<ResumeStore>()(
   persist(
     (set) => ({
       resume: initialResume,
+      activeSection: 0,
       updateContact: (contact) => set((state) => ({ resume: { ...state.resume, contact } })),
       updateSummary: (summary) => set((state) => ({ resume: { ...state.resume, summary } })),
       updateExperience: (experience) => set((state) => ({ resume: { ...state.resume, experience } })),
@@ -149,6 +152,7 @@ export const useResumeStore = create<ResumeStore>()(
       updateProjects: (projects) => set((state) => ({ resume: { ...state.resume, projects } })),
       updateVolunteer: (volunteer) => set((state) => ({ resume: { ...state.resume, volunteer } })),
       updateReferences: (references) => set((state) => ({ resume: { ...state.resume, references } })),
+      setActiveSection: (section) => set({ activeSection: section }),
     }),
     {
       name: 'resume-storage',
