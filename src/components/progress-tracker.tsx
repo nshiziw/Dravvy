@@ -18,6 +18,7 @@ const sections = [
   { id: 'awards', label: 'Awards' },
   { id: 'styling', label: 'Resume Styling' },
   { id: 'preview', label: 'Resume Preview' },
+  { id: 'export', label: 'Export Resume' },
 ]
 
 export function ProgressTracker() {
@@ -25,6 +26,11 @@ export function ProgressTracker() {
   const progress = calculateProgress(resume)
   const message = getProgressMessage(progress)
   const activeSection = useResumeStore((state) => state.activeSection)
+  const setActiveSection = useResumeStore((state) => state.setActiveSection)
+
+  const handleStepClick = (index: number) => {
+    setActiveSection(index)
+  }
 
   const isSectionCompleted = (sectionId: string) => {
     switch (sectionId) {
@@ -71,16 +77,17 @@ export function ProgressTracker() {
               return (
                 <motion.div
                   key={section.id}
-                  className="flex flex-col items-center"
+                  className="flex flex-col items-center cursor-pointer group"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
+                  onClick={() => handleStepClick(index)}
                 >
                   <div className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center mb-2 relative z-10",
-                    status === 'completed' && "bg-green-500",
-                    status === 'active' && "bg-blue-500",
-                    status === 'pending' && "bg-gray-200"
+                    "w-8 h-8 rounded-full flex items-center justify-center mb-2 relative z-10 transition-transform duration-200 ease-in-out transform group-hover:scale-110",
+                    status === 'completed' && "bg-green-500 group-hover:bg-green-600",
+                    status === 'active' && "bg-blue-500 group-hover:bg-blue-600",
+                    status === 'pending' && "bg-gray-200 group-hover:bg-gray-300"
                   )}>
                     {status === 'completed' ? (
                       <Check className="h-4 w-4 text-white" />
@@ -94,10 +101,10 @@ export function ProgressTracker() {
                     )}
                   </div>
                   <p className={cn(
-                    "text-xs font-medium text-center max-w-[100px]",
-                    status === 'completed' && "text-green-600",
-                    status === 'active' && "text-blue-600",
-                    status === 'pending' && "text-gray-600"
+                    "text-xs font-medium text-center max-w-[100px] transition-colors duration-200",
+                    status === 'completed' && "text-green-600 group-hover:text-green-700",
+                    status === 'active' && "text-blue-600 group-hover:text-blue-700",
+                    status === 'pending' && "text-gray-600 group-hover:text-gray-700"
                   )}>
                     {section.label}
                   </p>

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 type Contact = {
   name: string;
@@ -158,6 +158,14 @@ const initialResume: Resume = {
   references: [],
 }
 
+const storage = typeof window !== 'undefined' 
+  ? createJSONStorage(() => localStorage)
+  : createJSONStorage(() => ({
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    }))
+
 export const useResumeStore = create<ResumeStore>()(
   persist(
     (set) => ({
@@ -181,6 +189,7 @@ export const useResumeStore = create<ResumeStore>()(
     }),
     {
       name: 'resume-storage',
+      storage,
       skipHydration: true,
     }
   )

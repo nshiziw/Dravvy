@@ -9,7 +9,7 @@ import { useResumeStore } from '@/store/useResumeStore'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 
 type Section = {
-  id: 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'awards' | 'styling' | 'preview'
+  id: 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'awards' | 'styling' | 'preview' | 'export'
   label: string
 }
 
@@ -24,30 +24,27 @@ const sections: Section[] = [
   { id: 'awards', label: 'Awards' },
   { id: 'styling', label: 'Resume Styling' },
   { id: 'preview', label: 'Resume Preview' },
+  { id: 'export', label: 'Export Resume' },
 ]
 
 export default function Home() {
-  const [activeSection, setActiveSection] = useState(0)
-  const setStoreActiveSection = useResumeStore((state) => state.setActiveSection)
+  const activeSection = useResumeStore((state) => state.activeSection)
+  const setActiveSection = useResumeStore((state) => state.setActiveSection)
 
   const handleNext = () => {
     if (activeSection < sections.length - 1) {
-      const newSection = activeSection + 1
-      setActiveSection(newSection)
-      setStoreActiveSection(newSection)
+      setActiveSection(activeSection + 1)
     }
   }
 
   const handlePrevious = () => {
     if (activeSection > 0) {
-      const newSection = activeSection - 1
-      setActiveSection(newSection)
-      setStoreActiveSection(newSection)
+      setActiveSection(activeSection - 1)
     }
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mx-auto px-[5%] py-8">
       <header className="mb-8 text-center">
         <h1 className="text-4xl font-bold text-gray-900">Dravvy</h1>
         <p className="mt-2 text-lg text-gray-600">
@@ -64,6 +61,8 @@ export default function Home() {
             </h2>
             {sections[activeSection].id === 'preview' ? (
               <ResumePreview />
+            ) : sections[activeSection].id === 'export' ? (
+              <ResumeForm section="export" />
             ) : (
               <ResumeForm section={sections[activeSection].id} />
             )}

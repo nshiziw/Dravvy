@@ -10,9 +10,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { useState, useEffect } from 'react'
 import { StylingForm } from './styling-form'
+import { ExportForm } from './export-form'
 
 interface ResumeFormProps {
-  section: 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'awards' | 'styling'
+  section: 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'awards' | 'styling' | 'export'
 }
 
 const inputStyles = "w-full px-4 py-2.5 text-gray-700 bg-white border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 ease-in-out placeholder-gray-400 outline-none"
@@ -330,6 +331,10 @@ export function ResumeForm({ section }: ResumeFormProps) {
 
   if (section === 'styling') {
     return <StylingForm />
+  }
+
+  if (section === 'export') {
+    return <ExportForm />
   }
 
   if (section === 'contact') {
@@ -1176,10 +1181,6 @@ export function ResumeForm({ section }: ResumeFormProps) {
         )}
       </form>
     )
-  }
-
-  if (section === 'styling') {
-    return <StylingForm />
   }
 
   return null

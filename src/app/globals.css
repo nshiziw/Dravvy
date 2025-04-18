@@ -72,8 +72,10 @@
 @layer base {
   * {
     @apply border-border;
+    user-select: none;
   }
   body {
     @apply bg-background text-foreground;
+    user-select: none;
   }
 }
