@@ -134,12 +134,13 @@ const styles = StyleSheet.create({
 
 export function ResumePDF() {
   const hydrated = useHydration()
-  const resume = useResumeStore((state) => state.resume)
-  const styling = useResumeStore((state) => state.styling)
+  const store = useResumeStore.getState()
 
   if (!hydrated) {
     return null
   }
+
+  const { resume, styling } = store
 
   const fontFamily = styling.fontFamily === 'Times New Roman' ? 'Times New Roman' : 'Arial'
 
