@@ -62,6 +62,9 @@ const styles = StyleSheet.create({
   page: {
     padding: MARGIN,
     fontFamily: 'Arial',
+    width: A4_WIDTH,
+    height: A4_HEIGHT,
+    backgroundColor: '#FFFFFF',
   },
   header: {
     marginBottom: 20,
@@ -131,7 +134,8 @@ const styles = StyleSheet.create({
 
 export function ResumePDF() {
   const hydrated = useHydration()
-  const { resume, styling } = useResumeStore()
+  const resume = useResumeStore((state) => state.resume)
+  const styling = useResumeStore((state) => state.styling)
 
   if (!hydrated) {
     return null
