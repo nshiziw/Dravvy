@@ -14,6 +14,9 @@ import type {
 } from '@/types/resume';
 
 interface ResumeState extends ResumeData {
+  activeSection: number;
+  setActiveSection: (section: number) => void;
+  
   // Contact
   updateContact: (contact: ContactInfo) => void;
   
@@ -63,7 +66,8 @@ interface ResumeState extends ResumeData {
   resetStore: () => void;
 }
 
-const initialState: Omit<ResumeState, keyof Omit<ResumeState, keyof ResumeData>> = {
+const initialState: Omit<ResumeState, keyof Omit<ResumeState, keyof ResumeData | 'activeSection'>> = {
+  activeSection: 0,
   contact: {
     fullName: '',
     email: '',
@@ -89,6 +93,9 @@ export const useResumeStore = create<ResumeState>()(
   persist(
     (set) => ({
       ...initialState,
+      
+      // Navigation
+      setActiveSection: (section) => set({ activeSection: section }),
       
       // Contact
       updateContact: (contact) => set({ contact }),

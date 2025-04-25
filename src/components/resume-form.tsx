@@ -12,6 +12,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { StylingForm } from './styling-form'
 import { ExportForm } from './export-form'
+import { ContactForm } from './contact-form'
+import { SummaryForm } from './summary-form'
 
 interface ResumeFormProps {
   section: 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'awards' | 'styling' | 'export'
@@ -44,62 +46,52 @@ export function ResumeForm({ section }: ResumeFormProps) {
   const [awards, setAwards] = React.useState<Award[]>([])
 
   const contact = useResumeStore((state: { contact: ResumeData['contact'] }) => state.contact)
-  const summary = useResumeStore((state: { summary: ResumeData['summary'] }) => state.summary)
+  const summary = useResumeStore((state: { summary: string }) => state.summary)
   const updateContact = useResumeStore((state: { updateContact: (contact: ResumeData['contact']) => void }) => state.updateContact)
   const updateSummary = useResumeStore((state: { updateSummary: (summary: string) => void }) => state.updateSummary)
-  const updateExperience = useResumeStore((state: { updateExperience: (experience: Experience[]) => void }) => state.updateExperience)
-  const updateEducation = useResumeStore((state: { updateEducation: (education: Education[]) => void }) => state.updateEducation)
-  const updateSkills = useResumeStore((state: { updateSkills: (skills: Skill[]) => void }) => state.updateSkills)
-  const updateProjects = useResumeStore((state: { updateProjects: (projects: Project[]) => void }) => state.updateProjects)
-  const updateCertifications = useResumeStore((state: { updateCertifications: (certifications: Certification[]) => void }) => state.updateCertifications)
-  const updateAwards = useResumeStore((state: { updateAwards: (awards: Award[]) => void }) => state.updateAwards)
+  
+  const storeAddExperience = useResumeStore((state: { addExperience: (experience: Omit<Experience, 'id'>) => void }) => state.addExperience)
+  const storeUpdateExperience = useResumeStore((state: { updateExperience: (experience: Experience) => void }) => state.updateExperience)
+  const storeRemoveExperience = useResumeStore((state: { removeExperience: (id: string) => void }) => state.removeExperience)
+  
+  const storeAddEducation = useResumeStore((state: { addEducation: (education: Omit<Education, 'id'>) => void }) => state.addEducation)
+  const storeUpdateEducation = useResumeStore((state: { updateEducation: (education: Education) => void }) => state.updateEducation)
+  const storeRemoveEducation = useResumeStore((state: { removeEducation: (id: string) => void }) => state.removeEducation)
+  
+  const storeAddSkill = useResumeStore((state: { addSkill: (skill: Omit<Skill, 'id'>) => void }) => state.addSkill)
+  const storeUpdateSkill = useResumeStore((state: { updateSkill: (skill: Skill) => void }) => state.updateSkill)
+  const storeRemoveSkill = useResumeStore((state: { removeSkill: (id: string) => void }) => state.removeSkill)
+  
+  const storeAddProject = useResumeStore((state: { addProject: (project: Omit<Project, 'id'>) => void }) => state.addProject)
+  const storeUpdateProject = useResumeStore((state: { updateProject: (project: Project) => void }) => state.updateProject)
+  const storeRemoveProject = useResumeStore((state: { removeProject: (id: string) => void }) => state.removeProject)
+  
+  const storeAddCertification = useResumeStore((state: { addCertification: (certification: Omit<Certification, 'id'>) => void }) => state.addCertification)
+  const storeUpdateCertification = useResumeStore((state: { updateCertification: (certification: Certification) => void }) => state.updateCertification)
+  const storeRemoveCertification = useResumeStore((state: { removeCertification: (id: string) => void }) => state.removeCertification)
+  
+  const storeAddAward = useResumeStore((state: { addAward: (award: Omit<Award, 'id'>) => void }) => state.addAward)
+  const storeUpdateAward = useResumeStore((state: { updateAward: (award: Award) => void }) => state.updateAward)
+  const storeRemoveAward = useResumeStore((state: { removeAward: (id: string) => void }) => state.removeAward)
 
-  const addExperience = () => {
-    setExperiences([...experiences, {
-      id: crypto.randomUUID(),
+  const handleAddExperience = () => {
+    const newExperience = {
       company: '',
       position: '',
       startDate: '',
       endDate: '',
       current: false,
       description: []
-    }])
-  }
-
-  const removeExperience = (index: number) => {
-    setExperiences(experiences.filter((_, i) => i !== index))
-  }
-
-  const addDescriptionPoint = (expIndex: number) => {
-    if (newDescription.trim() && experiences[expIndex].description.length < 5) {
-      const updatedExperiences = [...experiences]
-      updatedExperiences[expIndex].description.push(newDescription.trim())
-      setExperiences(updatedExperiences)
-      setNewDescription('')
     }
+    storeAddExperience(newExperience)
   }
 
-  const removeDescriptionPoint = (expIndex: number, descIndex: number) => {
-    const updatedExperiences = [...experiences]
-    updatedExperiences[expIndex].description = updatedExperiences[expIndex].description.filter((_, i) => i !== descIndex)
-    setExperiences(updatedExperiences)
+  const handleRemoveExperience = (id: string) => {
+    storeRemoveExperience(id)
   }
 
-  const handleExperienceChange = (index: number, field: keyof Experience, value: string | boolean) => {
-    const updatedExperiences = [...experiences]
-    updatedExperiences[index] = {
-      ...updatedExperiences[index],
-      [field]: value
-    }
-    setExperiences(updatedExperiences)
-  }
-
-  const handleExperienceSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    updateExperience(experiences)
-    setIsSubmitting(false)
-    setSubmitSuccess(true)
-    setTimeout(() => setSubmitSuccess(false), 3000)
+  const handleExperienceChange = (experience: Experience) => {
+    storeUpdateExperience(experience)
   }
 
   const addEducation = () => {
@@ -114,10 +106,6 @@ export function ResumeForm({ section }: ResumeFormProps) {
     }])
   }
 
-  const removeEducation = (index: number) => {
-    setEducations(educations.filter((_, i) => i !== index))
-  }
-
   const handleEducationChange = (index: number, field: keyof Education, value: string) => {
     const updatedEducations = [...educations]
     updatedEducations[index] = {
@@ -129,7 +117,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
 
   const handleEducationSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    updateEducation(educations)
+    educations.forEach(education => storeUpdateEducation(education))
     setIsSubmitting(false)
     setSubmitSuccess(true)
     setTimeout(() => setSubmitSuccess(false), 3000)
@@ -143,10 +131,6 @@ export function ResumeForm({ section }: ResumeFormProps) {
       technologies: [],
       link: ''
     }])
-  }
-
-  const removeProject = (index: number) => {
-    setProjects(projects.filter((_, i) => i !== index))
   }
 
   const handleProjectChange = (index: number, field: keyof Project, value: string | string[]) => {
@@ -175,22 +159,18 @@ export function ResumeForm({ section }: ResumeFormProps) {
 
   const handleProjectSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    updateProjects(projects)
+    projects.forEach(project => storeUpdateProject(project))
     setIsSubmitting(false)
     setSubmitSuccess(true)
     setTimeout(() => setSubmitSuccess(false), 3000)
   }
 
   const addSkill = () => {
-    setSkills([...skills, {
+      setSkills([...skills, {
       id: crypto.randomUUID(),
       category: '',
       skills: []
     }])
-  }
-
-  const removeSkill = (index: number) => {
-    setSkills(skills.filter((_, i) => i !== index))
   }
 
   const handleSkillChange = (index: number, field: keyof Skill, value: string | string[]) => {
@@ -204,7 +184,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
 
   const handleSkillsSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    updateSkills(skills)
+    skills.forEach(skill => storeUpdateSkill(skill))
     setIsSubmitting(false)
     setSubmitSuccess(true)
     setTimeout(() => setSubmitSuccess(false), 3000)
@@ -220,10 +200,6 @@ export function ResumeForm({ section }: ResumeFormProps) {
     }])
   }
 
-  const removeCertification = (index: number) => {
-    setCertifications(certifications.filter((_, i) => i !== index))
-  }
-
   const handleCertificationChange = (index: number, field: keyof Certification, value: string) => {
     const updatedCertifications = [...certifications]
     updatedCertifications[index] = {
@@ -235,7 +211,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
 
   const handleCertificationSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    updateCertifications(certifications)
+    certifications.forEach(certification => storeUpdateCertification(certification))
     setIsSubmitting(false)
     setSubmitSuccess(true)
     setTimeout(() => setSubmitSuccess(false), 3000)
@@ -251,10 +227,6 @@ export function ResumeForm({ section }: ResumeFormProps) {
     }])
   }
 
-  const removeAward = (index: number) => {
-    setAwards(awards.filter((_, i) => i !== index))
-  }
-
   const handleAwardChange = (index: number, field: keyof Award, value: string) => {
     const updatedAwards = [...awards]
     updatedAwards[index] = {
@@ -266,7 +238,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
 
   const handleAwardSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    updateAwards(awards)
+    awards.forEach(award => storeUpdateAward(award))
     setIsSubmitting(false)
     setSubmitSuccess(true)
     setTimeout(() => setSubmitSuccess(false), 3000)
@@ -279,7 +251,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
     return true
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
@@ -299,22 +271,22 @@ export function ResumeForm({ section }: ResumeFormProps) {
           updateSummary(summary)
           break
         case 'experience':
-          handleExperienceSubmit(e)
+          experiences.forEach(experience => storeUpdateExperience(experience))
           break
         case 'education':
-          handleEducationSubmit(e)
+          educations.forEach(education => storeUpdateEducation(education))
           break
         case 'skills':
-          handleSkillsSubmit(e)
+          skills.forEach(skill => storeUpdateSkill(skill))
           break
         case 'projects':
-          handleProjectSubmit(e)
+          projects.forEach(project => storeUpdateProject(project))
           break
         case 'certifications':
-          handleCertificationSubmit(e)
+          certifications.forEach(certification => storeUpdateCertification(certification))
           break
         case 'awards':
-          handleAwardSubmit(e)
+          awards.forEach(award => storeUpdateAward(award))
           break
         case 'styling':
         case 'export':
@@ -341,7 +313,450 @@ export function ResumeForm({ section }: ResumeFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Form content based on section */}
+      {section === 'contact' && <ContactForm />}
+      {section === 'summary' && <SummaryForm />}
+
+      {section === 'experience' && (
+        <div className="space-y-6">
+          {experiences.map((exp, index) => (
+            <div key={exp.id} className="p-4 space-y-4 border rounded-lg">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Experience {index + 1}</h3>
+                <Button
+                  type="button"
+                  onClick={() => handleRemoveExperience(exp.id)}
+                  variant="outline"
+                  className="text-red-600 hover:text-white hover:bg-red-600"
+                >
+                  Remove
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor={`company-${index}`} className={labelStyles}>Company</Label>
+                  <Input
+                    id={`company-${index}`}
+                    value={exp.company}
+                    onChange={(e) => handleExperienceChange({ ...exp, company: e.target.value })}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`position-${index}`} className={labelStyles}>Position</Label>
+                  <Input
+                    id={`position-${index}`}
+                    value={exp.position}
+                    onChange={(e) => handleExperienceChange({ ...exp, position: e.target.value })}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`startDate-${index}`} className={labelStyles}>Start Date</Label>
+                  <Input
+                    id={`startDate-${index}`}
+                    type="date"
+                    value={exp.startDate}
+                    onChange={(e) => handleExperienceChange({ ...exp, startDate: e.target.value })}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`endDate-${index}`} className={labelStyles}>End Date</Label>
+                  <Input
+                    id={`endDate-${index}`}
+                    type="date"
+                    value={exp.endDate}
+                    onChange={(e) => handleExperienceChange({ ...exp, endDate: e.target.value })}
+                    className={inputStyles}
+                    disabled={exp.current}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className={labelStyles}>Description Points (max 5)</Label>
+                {exp.description.map((desc, descIndex) => (
+                  <div key={descIndex} className="flex items-center gap-2">
+                    <Input
+                      value={desc}
+                      readOnly
+                      className={inputStyles}
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => handleExperienceChange({ ...exp, description: exp.description.filter((_, i) => i !== descIndex) })}
+                      variant="outline"
+                      className="text-red-600 hover:text-white hover:bg-red-600"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+                {exp.description.length < 5 && (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={newDescription}
+                      onChange={(e) => setNewDescription(e.target.value)}
+                      className={inputStyles}
+                      placeholder="Add a description point"
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => handleExperienceChange({ ...exp, description: [...exp.description, newDescription.trim()] })}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+          <Button
+            type="button"
+            onClick={handleAddExperience}
+            className="w-full"
+          >
+            Add Experience
+          </Button>
+        </div>
+      )}
+
+      {section === 'education' && (
+        <div className="space-y-6">
+          {educations.map((edu, index) => (
+            <div key={edu.id} className="p-4 space-y-4 border rounded-lg">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Education {index + 1}</h3>
+                <Button
+                  type="button"
+                  onClick={() => storeRemoveEducation(edu.id)}
+                  variant="outline"
+                  className="text-red-600 hover:text-white hover:bg-red-600"
+                >
+                  Remove
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor={`school-${index}`} className={labelStyles}>School</Label>
+                  <Input
+                    id={`school-${index}`}
+                    value={edu.school}
+                    onChange={(e) => handleEducationChange(index, 'school', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`degree-${index}`} className={labelStyles}>Degree</Label>
+                  <Input
+                    id={`degree-${index}`}
+                    value={edu.degree}
+                    onChange={(e) => handleEducationChange(index, 'degree', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`field-${index}`} className={labelStyles}>Field of Study</Label>
+                  <Input
+                    id={`field-${index}`}
+                    value={edu.field}
+                    onChange={(e) => handleEducationChange(index, 'field', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`startDate-${index}`} className={labelStyles}>Start Date</Label>
+                  <Input
+                    id={`startDate-${index}`}
+                    type="date"
+                    value={edu.startDate}
+                    onChange={(e) => handleEducationChange(index, 'startDate', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`endDate-${index}`} className={labelStyles}>End Date</Label>
+                  <Input
+                    id={`endDate-${index}`}
+                    type="date"
+                    value={edu.endDate}
+                    onChange={(e) => handleEducationChange(index, 'endDate', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`gpa-${index}`} className={labelStyles}>GPA</Label>
+                  <Input
+                    id={`gpa-${index}`}
+                    value={edu.gpa}
+                    onChange={(e) => handleEducationChange(index, 'gpa', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+          <Button
+            type="button"
+            onClick={addEducation}
+            className="w-full"
+          >
+            Add Education
+          </Button>
+        </div>
+      )}
+
+      {section === 'skills' && (
+        <div className="space-y-6">
+          {skills.map((skill, index) => (
+            <div key={skill.id} className="p-4 space-y-4 border rounded-lg">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Skill {index + 1}</h3>
+                <Button
+                  type="button"
+                  onClick={() => storeRemoveSkill(skill.id)}
+                  variant="outline"
+                  className="text-red-600 hover:text-white hover:bg-red-600"
+                >
+                  Remove
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor={`category-${index}`} className={labelStyles}>Category</Label>
+                  <Input
+                    id={`category-${index}`}
+                    value={skill.category}
+                    onChange={(e) => handleSkillChange(index, 'category', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`skills-${index}`} className={labelStyles}>Skills</Label>
+                  <Textarea
+                    id={`skills-${index}`}
+                    value={skill.skills.join('\n')}
+                    onChange={(e) => handleSkillChange(index, 'skills', e.target.value.split('\n'))}
+                    className={textareaStyles}
+                    rows={3}
+                    placeholder="Enter skills separated by new lines"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+          <Button
+            type="button"
+            onClick={addSkill}
+            className="w-full"
+          >
+            Add Skill
+          </Button>
+        </div>
+      )}
+
+      {section === 'projects' && (
+        <div className="space-y-6">
+          {projects.map((project, index) => (
+            <div key={project.id} className="p-4 space-y-4 border rounded-lg">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Project {index + 1}</h3>
+                <Button
+                  type="button"
+                  onClick={() => storeRemoveProject(project.id)}
+                  variant="outline"
+                  className="text-red-600 hover:text-white hover:bg-red-600"
+                >
+                  Remove
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor={`name-${index}`} className={labelStyles}>Name</Label>
+                  <Input
+                    id={`name-${index}`}
+                    value={project.name}
+                    onChange={(e) => handleProjectChange(index, 'name', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`link-${index}`} className={labelStyles}>Link</Label>
+                  <Input
+                    id={`link-${index}`}
+                    value={project.link}
+                    onChange={(e) => handleProjectChange(index, 'link', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`description-${index}`} className={labelStyles}>Description</Label>
+                  <Textarea
+                    id={`description-${index}`}
+                    value={project.description.join('\n')}
+                    onChange={(e) => handleProjectChange(index, 'description', e.target.value.split('\n'))}
+                    className={textareaStyles}
+                    rows={3}
+                    placeholder="Enter description points separated by new lines"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`technologies-${index}`} className={labelStyles}>Technologies</Label>
+                  <Textarea
+                    id={`technologies-${index}`}
+                    value={project.technologies.join('\n')}
+                    onChange={(e) => handleProjectChange(index, 'technologies', e.target.value.split('\n'))}
+                    className={textareaStyles}
+                    rows={3}
+                    placeholder="Enter technologies separated by new lines"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+          <Button
+            type="button"
+            onClick={addProject}
+            className="w-full"
+          >
+            Add Project
+          </Button>
+        </div>
+      )}
+
+      {section === 'certifications' && (
+        <div className="space-y-6">
+          {certifications.map((cert, index) => (
+            <div key={cert.id} className="p-4 space-y-4 border rounded-lg">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Certification {index + 1}</h3>
+                <Button
+                  type="button"
+                  onClick={() => storeRemoveCertification(cert.id)}
+                  variant="outline"
+                  className="text-red-600 hover:text-white hover:bg-red-600"
+                >
+                  Remove
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor={`name-${index}`} className={labelStyles}>Name</Label>
+                  <Input
+                    id={`name-${index}`}
+                    value={cert.name}
+                    onChange={(e) => handleCertificationChange(index, 'name', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`issuer-${index}`} className={labelStyles}>Issuer</Label>
+                  <Input
+                    id={`issuer-${index}`}
+                    value={cert.issuer}
+                    onChange={(e) => handleCertificationChange(index, 'issuer', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`date-${index}`} className={labelStyles}>Date</Label>
+                  <Input
+                    id={`date-${index}`}
+                    type="date"
+                    value={cert.date}
+                    onChange={(e) => handleCertificationChange(index, 'date', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`link-${index}`} className={labelStyles}>Link</Label>
+                  <Input
+                    id={`link-${index}`}
+                    value={cert.link}
+                    onChange={(e) => handleCertificationChange(index, 'link', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+          <Button
+            type="button"
+            onClick={addCertification}
+            className="w-full"
+          >
+            Add Certification
+          </Button>
+        </div>
+      )}
+
+      {section === 'awards' && (
+        <div className="space-y-6">
+          {awards.map((award, index) => (
+            <div key={award.id} className="p-4 space-y-4 border rounded-lg">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Award {index + 1}</h3>
+                <Button
+                  type="button"
+                  onClick={() => storeRemoveAward(award.id)}
+                  variant="outline"
+                  className="text-red-600 hover:text-white hover:bg-red-600"
+                >
+                  Remove
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor={`title-${index}`} className={labelStyles}>Title</Label>
+                  <Input
+                    id={`title-${index}`}
+                    value={award.title}
+                    onChange={(e) => handleAwardChange(index, 'title', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`issuer-${index}`} className={labelStyles}>Issuer</Label>
+                  <Input
+                    id={`issuer-${index}`}
+                    value={award.issuer}
+                    onChange={(e) => handleAwardChange(index, 'issuer', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`date-${index}`} className={labelStyles}>Date</Label>
+                  <Input
+                    id={`date-${index}`}
+                    type="date"
+                    value={award.date}
+                    onChange={(e) => handleAwardChange(index, 'date', e.target.value)}
+                    className={inputStyles}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`description-${index}`} className={labelStyles}>Description</Label>
+                  <Textarea
+                    id={`description-${index}`}
+                    value={award.description}
+                    onChange={(e) => handleAwardChange(index, 'description', e.target.value)}
+                    className={textareaStyles}
+                    rows={3}
+                    placeholder="Enter a brief description of the award"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+          <Button
+            type="button"
+            onClick={addAward}
+            className="w-full"
+          >
+            Add Award
+          </Button>
+        </div>
+      )}
+
       {error && (
         <div className="p-4 text-sm text-red-700 bg-red-100 rounded-lg">
           {error}
@@ -355,7 +770,7 @@ export function ResumeForm({ section }: ResumeFormProps) {
       <Button
         type="submit"
         disabled={isSubmitting}
-        className={buttonStyles}
+        variant="default"
       >
         {isSubmitting ? 'Saving...' : 'Save Changes'}
       </Button>
