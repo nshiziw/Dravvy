@@ -1,0 +1,54 @@
+The system will have 3 main sections:
+    1. The Introduction section: This section (can be a page/route also) will be like a landing page, where it will have components that explain the project
+        a. In this section try to put a header, hero section, key components, footer... and other information that can be put on a landing page
+    2. This section will be the main section where a resume will be created, all of the needed data will be inserted in this section
+        a. In this section, there'll be to main sub-sections, the progress bar and the content section
+        b. The progress bar will show the completed steps, the active step and the remaining step
+        c. Each step in the progress bar must have number and title
+        d. Each step header will be clickable in order to navigate to that step
+        e. On the content section there'll be a next and previous button to navigate between steps
+        f. Add a * on required fields
+        g. The progress bar in this section will have the following steps:
+            i. Basic information: full names, title, email address, phone number, personal website, linkedin profile, github profile, location, summary ⚠️ All data here are required except personal website, linkedin profile, github profile
+            ii. Work experience: job title, company name, location, start date, end date/present, description (minimum 2 points, maximum 4 points) ⚠️Users will be able to add more than one work experiences, all of the data here are required when adding work experience
+            iii. Education: Degree name, Institution, start date, end date/expected date, location ⚠️Users will be able to add more than one educations, All data here are required when adding education
+            iv. Skills: skill name ⚠️Users will be able to add more than one skills, Data is required
+            v. Certifications: title, issuer, issue date ⚠️Users will be able to add more than one Certifications, All data are required when adding a Certification
+            vi. Project: name, description, tech stack ⚠️Users will be able to add more than one project, All data are required when adding a project
+            vii. Languages: Language, proficiency(native, fluent, proficient, intermediate, beginner, basic) ⚠️Users will be able to add more than one Language, All data are required when adding a Language
+            viii. Reference: Choose to say: References available upon request or mention: name, relationship, email, phone ⚠️Users will be able to add more than one Reference, All data are required when adding a reference
+    3. This is the final section for styling of the resume, preview and exporting of the resume into a PDF document
+        a. This section will also contain two sub-sections, the progress bar and the content section
+        b. The progress bar will have three steps: styling, preview and export
+        c. On the styling step:
+            i. To view styling changes there must be a button to save stylings in order to be affected on the preview
+            ii. There'll be an option to choose a font to be on the resume; serif: times new roman, georgia, cambria, garamond and sans-serif: calibri, helvetica, arial, roboto, lato, open sans
+            iii. There will be an option to choose separator of sections: line, double line, bold line, no separator
+            iv. Users will also have an option to choose font sizes: small, medium, large and to choose spacing: small, medium, large
+            v. Users will also have the ability to choose date formats
+        d. On the resume preview section:
+            i. All of the styles chosen must be applied
+        e. On the export resume section:
+            i. A resume must be saved by the names of the resume
+            ii. A resume must have all of the styles from the resume preview
+            iii. The PDF document to be exported must be an A4 document
+
+In simple words, you may create three routes:
+    1. The landing page
+    2. The creation page
+    3. The settings page
+
+Things needed to be used:
+1. Next.js on the frontend
+2. Zustand for state management
+3. React Hook Form for form management
+4. Tailwind CSS and ShadCN for styling
+5. react-icons for icons
+6. sonner for notifications and messages
+7. Zod for validations
+8. react router dom for routing
+9. framer motion for animations
+10. react to pdf library for exporting content to PDF
+
+Important to know:
+1. No need to add testing libraries
