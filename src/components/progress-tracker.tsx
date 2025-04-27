@@ -81,8 +81,8 @@ export function ProgressTracker() {
   }
 
   const getStepStatus = (index: number) => {
-    if (isSectionCompleted(sections[index].id)) return 'completed'
     if (index === activeSection) return 'active'
+    if (isSectionCompleted(sections[index].id)) return 'completed'
     return 'pending'
   }
 
@@ -112,7 +112,7 @@ export function ProgressTracker() {
                     "w-8 h-8 rounded-full flex items-center justify-center mb-2 relative z-10 transition-transform duration-200 ease-in-out transform group-hover:scale-110",
                     status === 'completed' && "bg-green-500 group-hover:bg-green-600",
                     status === 'active' && "bg-blue-500 group-hover:bg-blue-600",
-                    status === 'pending' && "bg-gray-200 group-hover:bg-gray-300"
+                    status === 'pending' && "bg-gray-300 group-hover:bg-gray-400"
                   )}>
                     {status === 'completed' ? (
                       <Check className="w-4 h-4 text-white" />

@@ -16,6 +16,7 @@ import { Card } from "@/components/ui/card"
 import { useUIStore } from "@/store/useUIStore"
 import { languageSchema, referenceSchema } from "@/lib/validations/resume"
 import { nanoid } from "nanoid"
+import { useRouter } from 'next/navigation'
 
 interface ResumeFormProps {
   section: 'basic' | 'work' | 'education' | 'skills' | 'certifications' | 'projects' | 'languages' | 'references'
@@ -31,6 +32,9 @@ function MainResumeForm({ section }: ResumeFormProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [submitSuccess, setSubmitSuccess] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const setActiveSection = useUIStore((state) => state.setActiveSection)
+  const activeSection = useUIStore((state) => state.activeSection)
+  const router = useRouter()
 
   const [experiences, setExperiences] = React.useState<Experience[]>([])
   const [newDescription, setNewDescription] = React.useState('')
@@ -128,7 +132,6 @@ function MainResumeForm({ section }: ResumeFormProps) {
     educations.forEach(education => storeUpdateEducation(education))
     setIsSubmitting(false)
     setSubmitSuccess(true)
-    toast.success('Education updated successfully')
     setTimeout(() => setSubmitSuccess(false), 3000)
   }
 
@@ -171,7 +174,6 @@ function MainResumeForm({ section }: ResumeFormProps) {
     projects.forEach(project => storeUpdateProject(project))
     setIsSubmitting(false)
     setSubmitSuccess(true)
-    toast.success('Projects updated successfully')
     setTimeout(() => setSubmitSuccess(false), 3000)
   }
 
@@ -197,7 +199,6 @@ function MainResumeForm({ section }: ResumeFormProps) {
     skills.forEach(skill => storeUpdateSkill(skill))
     setIsSubmitting(false)
     setSubmitSuccess(true)
-    toast.success('Skills updated successfully')
     setTimeout(() => setSubmitSuccess(false), 3000)
   }
 
@@ -225,7 +226,6 @@ function MainResumeForm({ section }: ResumeFormProps) {
     certifications.forEach(certification => storeUpdateCertification(certification))
     setIsSubmitting(false)
     setSubmitSuccess(true)
-    toast.success('Certifications updated successfully')
     setTimeout(() => setSubmitSuccess(false), 3000)
   }
 
@@ -251,7 +251,6 @@ function MainResumeForm({ section }: ResumeFormProps) {
     languages.forEach(language => storeUpdateLanguage(language))
     setIsSubmitting(false)
     setSubmitSuccess(true)
-    toast.success('Languages updated successfully')
     setTimeout(() => setSubmitSuccess(false), 3000)
   }
 
@@ -279,7 +278,6 @@ function MainResumeForm({ section }: ResumeFormProps) {
     references.forEach(reference => storeUpdateReference(reference))
     setIsSubmitting(false)
     setSubmitSuccess(true)
-    toast.success('References updated successfully')
     setTimeout(() => setSubmitSuccess(false), 3000)
   }
 
@@ -293,15 +291,14 @@ function MainResumeForm({ section }: ResumeFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setError(null)
-
     try {
       switch (section) {
         case 'basic':
           if (!validateContact(contact)) {
             throw new Error('Please fill in all required fields')
           }
-          updateContact(contact)
+          await updateContact(contact)
+          await updateSummary(summary)
           break
         case 'work':
           experiences.forEach(experience => {
@@ -358,17 +355,20 @@ function MainResumeForm({ section }: ResumeFormProps) {
             }
           })
           references.forEach(reference => storeUpdateReference(reference))
+          router.push('/settings')
           break
       }
-
+      toast.success(`${section.charAt(0).toUpperCase() + section.slice(1)} saved successfully`)
       setSubmitSuccess(true)
-      toast.success('Data saved successfully')
-      setTimeout(() => setSubmitSuccess(false), 3000)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
-      toast.error(err instanceof Error ? err.message : 'An error occurred')
+      if (section !== 'references') {
+        setActiveSection(activeSection + 1)
+      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'An error occurred')
+      toast.error(error instanceof Error ? error.message : 'Failed to save changes')
     } finally {
       setIsSubmitting(false)
+      setTimeout(() => setSubmitSuccess(false), 3000)
     }
   }
 
@@ -1164,13 +1164,24 @@ function MainResumeForm({ section }: ResumeFormProps) {
         </div>
       )}
 
-      <Button
-        type="submit"
-        className={buttonStyles}
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? 'Saving...' : 'Save'}
-      </Button>
+      <div className="flex justify-between">
+        <Button
+          type="submit"
+          className={buttonStyles}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Saving...' : 'Save Changes'}
+        </Button>
+        {section !== 'references' && (
+          <Button
+            type="button"
+            className={buttonStyles}
+            onClick={() => setActiveSection(activeSection + 1)}
+          >
+            Next
+          </Button>
+        )}
+      </div>
     </form>
   )
 }
@@ -1248,77 +1259,102 @@ function LanguageFormComponent() {
 }
 
 function ReferenceFormComponent() {
-  const { references, addReference, updateReference, removeReference } = useResumeStore()
-  const form = useForm<Reference>({
-    resolver: zodResolver(referenceSchema),
-    defaultValues: {
-      id: '',
-      name: '',
-      relationship: '',
-      email: '',
-      phone: ''
-    }
-  })
+  const references = useResumeStore((state) => state.references)
+  const addReference = useResumeStore((state) => state.addReference)
+  const updateReference = useResumeStore((state) => state.updateReference)
+  const removeReference = useResumeStore((state) => state.removeReference)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const router = useRouter()
 
-  const onSubmit = (data: Omit<Reference, 'id'>) => {
-    const newReference = { ...data, id: nanoid() }
-    addReference(newReference)
-    form.reset()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    try {
+      // Save references
+      references.forEach(ref => updateReference(ref))
+      toast.success('References saved successfully')
+      router.push('/settings')
+    } catch (error) {
+      toast.error('Failed to save references')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
-    <Card className="p-6">
-      <h2 className="mb-4 text-2xl font-bold">References</h2>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <Label htmlFor="name">Name</Label>
-          <Input {...form.register("name")} placeholder="e.g., John Doe" />
-          {form.formState.errors.name && (
-            <p className="text-sm text-red-500">{form.formState.errors.name.message}</p>
-          )}
-        </div>
-        <div>
-          <Label htmlFor="relationship">Relationship</Label>
-          <Input {...form.register("relationship")} placeholder="e.g., Former Manager" />
-          {form.formState.errors.relationship && (
-            <p className="text-sm text-red-500">{form.formState.errors.relationship.message}</p>
-          )}
-        </div>
-        <div>
-          <Label htmlFor="email">Email</Label>
-          <Input {...form.register("email")} type="email" placeholder="e.g., john@example.com" />
-          {form.formState.errors.email && (
-            <p className="text-sm text-red-500">{form.formState.errors.email.message}</p>
-          )}
-        </div>
-        <div>
-          <Label htmlFor="phone">Phone</Label>
-          <Input {...form.register("phone")} placeholder="e.g., +1 234 567 8900" />
-          {form.formState.errors.phone && (
-            <p className="text-sm text-red-500">{form.formState.errors.phone.message}</p>
-          )}
-        </div>
-        <Button type="submit">Add Reference</Button>
-      </form>
-
-      <div className="mt-6 space-y-4">
-        {references.map((reference) => (
-          <Card key={reference.id} className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-semibold">{reference.name}</p>
-                <p className="text-sm text-gray-600">{reference.relationship}</p>
-                <p className="text-sm text-gray-600">{reference.email}</p>
-                <p className="text-sm text-gray-600">{reference.phone}</p>
-              </div>
-              <Button variant="outline" onClick={() => removeReference(reference.id)}>
-                Remove
-              </Button>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {references.map((reference, index) => (
+        <Card key={reference.id} className="p-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor={`name-${index}`} className={labelStyles}>Name</Label>
+              <Input
+                id={`name-${index}`}
+                value={reference.name}
+                onChange={(e) => updateReference({ ...reference, name: e.target.value })}
+                className={inputStyles}
+                placeholder="Jane Smith"
+              />
             </div>
-          </Card>
-        ))}
+            <div className="space-y-2">
+              <Label htmlFor={`relationship-${index}`} className={labelStyles}>Relationship</Label>
+              <Input
+                id={`relationship-${index}`}
+                value={reference.relationship}
+                onChange={(e) => updateReference({ ...reference, relationship: e.target.value })}
+                className={inputStyles}
+                placeholder="Former Manager"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={`email-${index}`} className={labelStyles}>Email</Label>
+              <Input
+                id={`email-${index}`}
+                type="email"
+                value={reference.email}
+                onChange={(e) => updateReference({ ...reference, email: e.target.value })}
+                className={inputStyles}
+                placeholder="jane.smith@example.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={`phone-${index}`} className={labelStyles}>Phone</Label>
+              <Input
+                id={`phone-${index}`}
+                value={reference.phone}
+                onChange={(e) => updateReference({ ...reference, phone: e.target.value })}
+                className={inputStyles}
+                placeholder="+1 (555) 123-4567"
+              />
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => removeReference(reference.id)}
+            className="mt-4"
+          >
+            Remove Reference
+          </Button>
+        </Card>
+      ))}
+      <Button
+        type="button"
+        onClick={() => addReference({ name: '', relationship: '', email: '', phone: '' })}
+        className="w-full"
+      >
+        Add Reference
+      </Button>
+      <div className="flex justify-between">
+        <Button
+          type="submit"
+          className={buttonStyles}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Saving...' : 'Save Changes'}
+        </Button>
       </div>
-    </Card>
+    </form>
   )
 }
 
