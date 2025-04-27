@@ -1,13 +1,23 @@
-import { Resume } from '@/store/useResumeStore'
+import type { ResumeData } from '@/types/resume'
 
-export const calculateProgress = (resume: Resume): number => {
+export const calculateProgress = (resume: Partial<ResumeData>): number => {
   const sections = [
-    resume.contact.name && resume.contact.email && resume.contact.phone ? 1 : 0,
-    resume.summary ? 1 : 0,
-    resume.skills.length >= 3 ? 1 : 0,
-    resume.experience.length > 0 ? 1 : 0,
-    resume.education.length > 0 ? 1 : 0,
-    resume.projects.length > 0 ? 1 : 0,
+    // Basic Information
+    resume.contact?.fullName && resume.contact?.email && resume.contact?.phone && resume.contact?.location ? 1 : 0,
+    // Work Experience
+    (resume.experience?.length || 0) > 0 ? 1 : 0,
+    // Education
+    (resume.education?.length || 0) > 0 ? 1 : 0,
+    // Skills
+    (resume.skills?.length || 0) > 0 ? 1 : 0,
+    // Certifications
+    (resume.certifications?.length || 0) > 0 ? 1 : 0,
+    // Projects
+    (resume.projects?.length || 0) > 0 ? 1 : 0,
+    // Languages
+    (resume.languages?.length || 0) > 0 ? 1 : 0,
+    // References
+    (resume.references?.length || 0) > 0 ? 1 : 0,
   ]
 
   return Math.round((sections.reduce((a, b) => a + b) / sections.length) * 100)

@@ -5,109 +5,55 @@ import { StyleSheet, Document, Page, View, Text } from '@react-pdf/renderer'
 import { useResumeStore } from '@/store/useResumeStore'
 import type { ResumeData, Experience, Education, Skill, Project } from '@/types/resume'
 
-const styles = StyleSheet.create({
-  page: {
-    padding: 40,
-    fontFamily: 'Helvetica',
-    fontSize: 12,
-    color: '#1F2937',
-  },
-  header: {
-    marginBottom: 30,
-    borderBottom: '2px solid #3B82F6',
-    paddingBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    marginBottom: 8,
-    fontWeight: 'bold',
-    color: '#2563EB',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#4B5563',
-    marginBottom: 4,
-  },
-  section: {
-    marginBottom: 25,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#3B82F6',
-    marginBottom: 12,
-    borderBottom: '1px solid #E5E7EB',
-    paddingBottom: 4,
-  },
-  itemTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 4,
-  },
-  itemSubtitle: {
-    fontSize: 12,
-    color: '#4B5563',
-    marginBottom: 4,
-  },
-  description: {
-    fontSize: 12,
-    color: '#374151',
-    marginBottom: 8,
-    lineHeight: 1.5,
-  },
-  bulletContainer: {
-    flexDirection: 'row',
-    marginBottom: 4,
-    paddingLeft: 8,
-  },
-  bullet: {
-    width: 3,
-    height: 3,
-    backgroundColor: '#3B82F6',
-    borderRadius: 1.5,
-    marginRight: 8,
-    marginTop: 6,
-  },
-  bulletText: {
-    flex: 1,
-    fontSize: 12,
-    color: '#374151',
-    lineHeight: 1.5,
-  },
-  skillsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 8,
-  },
-  skillTag: {
-    backgroundColor: '#EFF6FF',
-    borderRadius: 4,
-    padding: '4 8',
-    marginRight: 8,
-    marginBottom: 8,
-    color: '#3B82F6',
-    fontSize: 11,
-  },
-  contactInfo: {
-    flexDirection: 'row',
-    marginBottom: 4,
-    alignItems: 'center',
-  },
-  contactIcon: {
-    width: 12,
-    height: 12,
-    marginRight: 6,
-  },
-  contactText: {
-    fontSize: 12,
-    color: '#4B5563',
+const getFontSize = (type: 'heading' | 'subheading' | 'body', fontSize: string) => {
+  switch (fontSize) {
+    case 'small':
+      return type === 'heading' ? 24 : type === 'subheading' ? 14 : 10;
+    case 'large':
+      return type === 'heading' ? 32 : type === 'subheading' ? 18 : 14;
+    default: // medium
+      return type === 'heading' ? 28 : type === 'subheading' ? 16 : 12;
   }
-})
+};
 
-const formatDate = (date: string) => {
+const getSpacing = (spacing: string) => {
+  switch (spacing) {
+    case 'small':
+      return 15;
+    case 'large':
+      return 35;
+    default: // medium
+      return 25;
+  }
+};
+
+const formatDate = (date: string, dateFormat: string) => {
   try {
-    return new Date(date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    if (!date) return '';
+    const dateObj = new Date(date);
+    
+    switch (dateFormat) {
+      case 'MM/YYYY':
+        return dateObj.toLocaleDateString('en-US', {
+          month: '2-digit',
+          year: 'numeric',
+        });
+      case 'MMM YYYY':
+        return dateObj.toLocaleDateString('en-US', {
+          month: 'short',
+          year: 'numeric',
+        });
+      case 'MMMM YYYY':
+        return dateObj.toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        });
+      default:
+        return dateObj.toLocaleDateString('en-US', {
+          month: 'short',
+          year: 'numeric',
+        });
+    }
   } catch (error) {
     console.error('Invalid date format:', error);
     return date;
@@ -116,13 +62,107 @@ const formatDate = (date: string) => {
 
 export function ResumePDF() {
   try {
-    const contact = useResumeStore.getState().contact;
-    const summary = useResumeStore.getState().summary;
-    const experience = useResumeStore.getState().experience;
-    const education = useResumeStore.getState().education;
-    const skills = useResumeStore.getState().skills;
-    const projects = useResumeStore.getState().projects;
-    const styling = useResumeStore.getState().style;
+    const { contact, summary, experience, education, skills, projects, style: styling, languages, references } = useResumeStore.getState();
+
+    const styles = StyleSheet.create({
+      page: {
+        padding: 40,
+        fontFamily: styling.fontFamily || 'Helvetica',
+        fontSize: getFontSize('body', styling.fontSize),
+        color: '#1F2937',
+      },
+      header: {
+        marginBottom: getSpacing(styling.spacing),
+        borderBottom: '2px solid #3B82F6',
+        paddingBottom: 20,
+      },
+      title: {
+        fontSize: getFontSize('heading', styling.fontSize),
+        marginBottom: 8,
+        fontWeight: 'bold',
+        color: '#2563EB',
+      },
+      subtitle: {
+        fontSize: getFontSize('body', styling.fontSize),
+        color: '#4B5563',
+        marginBottom: 4,
+      },
+      section: {
+        marginBottom: getSpacing(styling.spacing),
+      },
+      sectionTitle: {
+        fontSize: getFontSize('subheading', styling.fontSize),
+        fontWeight: 'bold',
+        color: '#3B82F6',
+        marginBottom: 12,
+        borderBottom: '1px solid #E5E7EB',
+        paddingBottom: 4,
+      },
+      itemTitle: {
+        fontSize: getFontSize('subheading', styling.fontSize),
+        fontWeight: 'bold',
+        color: '#1F2937',
+        marginBottom: 4,
+      },
+      itemSubtitle: {
+        fontSize: getFontSize('body', styling.fontSize),
+        color: '#4B5563',
+        marginBottom: 4,
+      },
+      description: {
+        fontSize: getFontSize('body', styling.fontSize),
+        color: '#374151',
+        marginBottom: 8,
+        lineHeight: 1.5,
+      },
+      bulletContainer: {
+        flexDirection: 'row',
+        marginBottom: 4,
+        paddingLeft: 8,
+      },
+      bullet: {
+        width: 3,
+        height: 3,
+        backgroundColor: '#3B82F6',
+        borderRadius: 1.5,
+        marginRight: 8,
+        marginTop: 6,
+      },
+      bulletText: {
+        flex: 1,
+        fontSize: getFontSize('body', styling.fontSize),
+        color: '#374151',
+        lineHeight: 1.5,
+      },
+      skillsGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginTop: 8,
+      },
+      skillTag: {
+        backgroundColor: '#EFF6FF',
+        borderRadius: 4,
+        padding: '4 8',
+        marginRight: 8,
+        marginBottom: 8,
+        color: '#3B82F6',
+        fontSize: getFontSize('body', styling.fontSize),
+      },
+      contactInfo: {
+        flexDirection: 'row',
+        marginBottom: 4,
+        alignItems: 'center',
+      },
+      contactIcon: {
+        width: 12,
+        height: 12,
+        marginRight: 6,
+      },
+      contactText: {
+        fontSize: getFontSize('body', styling.fontSize),
+        color: '#4B5563',
+      }
+    })
 
     return (
       <Document>
@@ -150,14 +190,14 @@ export function ResumePDF() {
           {experience.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Experience</Text>
-              {experience.map((exp: Experience, index: number) => (
-                <View key={exp.id} style={{ marginBottom: 15 }}>
+              {experience.map((exp: Experience) => (
+                <View key={exp.id} style={{ marginBottom: getSpacing(styling.spacing) / 2 }}>
                   <Text style={styles.itemTitle}>{exp.position}</Text>
                   <Text style={styles.itemSubtitle}>
                     {exp.company}
                   </Text>
                   <Text style={styles.itemSubtitle}>
-                    {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
+                    {formatDate(exp.startDate, styling.dateFormat)} - {exp.current ? 'Present' : formatDate(exp.endDate, styling.dateFormat)}
                   </Text>
                   {exp.description.map((desc: string, i: number) => (
                     <View key={i} style={styles.bulletContainer}>
@@ -173,14 +213,14 @@ export function ResumePDF() {
           {education.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Education</Text>
-              {education.map((edu: Education, index: number) => (
-                <View key={edu.id} style={{ marginBottom: 12 }}>
+              {education.map((edu: Education) => (
+                <View key={edu.id} style={{ marginBottom: getSpacing(styling.spacing) / 2 }}>
                   <Text style={styles.itemTitle}>{edu.degree}</Text>
                   <Text style={styles.itemSubtitle}>
                     {edu.school} • {edu.field}
                   </Text>
                   <Text style={styles.itemSubtitle}>
-                    {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
+                    {formatDate(edu.startDate, styling.dateFormat)} - {formatDate(edu.endDate, styling.dateFormat)}
                     {edu.gpa && ` • GPA: ${edu.gpa}`}
                   </Text>
                 </View>
@@ -199,6 +239,33 @@ export function ResumePDF() {
                   </View>
                 ))}
               </View>
+            </View>
+          )}
+
+          {languages.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Languages</Text>
+              <View style={styles.skillsGrid}>
+                {languages.map((lang) => (
+                  <View key={lang.id} style={styles.skillTag}>
+                    <Text>{lang.language} - {lang.proficiency}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {references.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>References</Text>
+              {references.map((ref) => (
+                <View key={ref.id} style={{ marginBottom: 12 }}>
+                  <Text style={styles.itemTitle}>{ref.name}</Text>
+                  <Text style={styles.itemSubtitle}>{ref.relationship}</Text>
+                  <Text style={styles.contactText}>{ref.email}</Text>
+                  <Text style={styles.contactText}>{ref.phone}</Text>
+                </View>
+              ))}
             </View>
           )}
 

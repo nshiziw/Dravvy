@@ -8,13 +8,56 @@ const formatDate = (dateString: string) => {
   try {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      year: 'numeric',
-    });
+    
+    switch (styling.dateFormat) {
+      case 'MM/YYYY':
+        return date.toLocaleDateString('en-US', {
+          month: '2-digit',
+          year: 'numeric',
+        });
+      case 'MMM YYYY':
+        return date.toLocaleDateString('en-US', {
+          month: 'short',
+          year: 'numeric',
+        });
+      case 'MMMM YYYY':
+        return date.toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        });
+      default:
+        return date.toLocaleDateString('en-US', {
+          month: 'short',
+          year: 'numeric',
+        });
+    }
   } catch (error) {
     console.error('Invalid date format:', error);
     return dateString;
+  }
+};
+
+// Helper function to get font size class
+const getFontSizeClass = (type: 'heading' | 'subheading' | 'body') => {
+  switch (styling.fontSize) {
+    case 'small':
+      return type === 'heading' ? 'text-xl' : type === 'subheading' ? 'text-base' : 'text-sm';
+    case 'large':
+      return type === 'heading' ? 'text-3xl' : type === 'subheading' ? 'text-xl' : 'text-base';
+    default: // medium
+      return type === 'heading' ? 'text-2xl' : type === 'subheading' ? 'text-lg' : 'text-sm';
+  }
+};
+
+// Helper function to get spacing class
+const getSpacingClass = () => {
+  switch (styling.spacing) {
+    case 'small':
+      return 'space-y-4';
+    case 'large':
+      return 'space-y-8';
+    default: // medium
+      return 'space-y-6';
   }
 };
 
@@ -25,6 +68,8 @@ export function ResumePreview(): JSX.Element {
   const education = useResumeStore((state: { education: ResumeData['education'] }) => state.education)
   const skills = useResumeStore((state: { skills: ResumeData['skills'] }) => state.skills)
   const projects = useResumeStore((state: { projects: ResumeData['projects'] }) => state.projects)
+  const languages = useResumeStore((state: { languages: ResumeData['languages'] }) => state.languages)
+  const references = useResumeStore((state: { references: ResumeData['references'] }) => state.references)
   const styling = useResumeStore((state: { style: ResumeData['style'] }) => state.style)
 
   const renderDivider = () => {
@@ -53,10 +98,10 @@ export function ResumePreview(): JSX.Element {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow" style={{ fontFamily: styling.fontFamily }}>
-      <h2 className="mb-4 text-lg font-semibold text-gray-900">Preview</h2>
-      <div className="space-y-6">
+      <h2 className={`mb-4 font-semibold text-gray-900 ${getFontSizeClass('subheading')}`}>Preview</h2>
+      <div className={getSpacingClass()}>
         <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-bold text-gray-900">{contact.name}</h1>
+          <h1 className={`font-bold text-gray-900 ${getFontSizeClass('heading')}`}>{contact.name}</h1>
           <div className="space-x-2 text-sm text-gray-600">
             {contact.phone && (
               styling.showLinks ? (
@@ -118,20 +163,20 @@ export function ResumePreview(): JSX.Element {
         {renderDivider()}
 
         <div>
-          <h4 className="font-medium text-gray-900">Summary</h4>
-          <p className="text-sm text-gray-600">{summary}</p>
+          <h4 className={`font-medium text-gray-900 ${getFontSizeClass('subheading')}`}>Summary</h4>
+          <p className={getFontSizeClass('body')}>{summary}</p>
         </div>
         
         {experience.length > 0 && (
           <>
             {renderDivider()}
-            <div className="space-y-4">
-              <h4 className="font-medium text-gray-900">Experience</h4>
+            <div className={getSpacingClass()}>
+              <h4 className={`font-medium text-gray-900 ${getFontSizeClass('subheading')}`}>Experience</h4>
               {experience.map((exp, index) => (
                 <div key={exp.id} className="space-y-2">
                   <div className="flex justify-between">
-                    <h5 className="font-semibold text-gray-800">{exp.jobTitle}</h5>
-                    <span className="text-sm text-gray-600">
+                    <h5 className={`font-semibold text-gray-800 ${getFontSizeClass('subheading')}`}>{exp.jobTitle}</h5>
+                    <span className={`text-gray-600 ${getFontSizeClass('body')}`}>
                       {formatDate(exp.startDate)} - {exp.isPresent ? 'Present' : formatDate(exp.endDate)}
                     </span>
                   </div>
@@ -153,13 +198,13 @@ export function ResumePreview(): JSX.Element {
         {education.length > 0 && (
           <>
             {renderDivider()}
-            <div className="space-y-4">
-              <h4 className="font-medium text-gray-900">Education</h4>
+            <div className={getSpacingClass()}>
+              <h4 className={`font-medium text-gray-900 ${getFontSizeClass('subheading')}`}>Education</h4>
               {education.map((edu, index) => (
                 <div key={edu.id} className="space-y-2">
                   <div className="flex justify-between">
-                    <h5 className="font-semibold text-gray-800">{edu.degree}</h5>
-                    <span className="text-sm text-gray-600">
+                    <h5 className={`font-semibold text-gray-800 ${getFontSizeClass('subheading')}`}>{edu.degree}</h5>
+                    <span className={`text-gray-600 ${getFontSizeClass('body')}`}>
                       {formatDate(edu.startDate)} - {edu.isExpected ? `Expected ${formatDate(edu.expectedDate)}` : formatDate(edu.endDate)}
                     </span>
                   </div>
@@ -176,14 +221,14 @@ export function ResumePreview(): JSX.Element {
         {projects.length > 0 && (
           <>
             {renderDivider()}
-            <div className="space-y-4">
-              <h4 className="font-medium text-gray-900">Projects</h4>
+            <div className={getSpacingClass()}>
+              <h4 className={`font-medium text-gray-900 ${getFontSizeClass('subheading')}`}>Projects</h4>
               {projects.map((project, index) => (
                 <div key={project.id} className="space-y-2">
                   <div className="flex justify-between">
-                    <h5 className="font-semibold text-gray-800">{project.name}</h5>
+                    <h5 className={`font-semibold text-gray-800 ${getFontSizeClass('subheading')}`}>{project.name}</h5>
                   </div>
-                  <p className="text-sm text-gray-600">{project.description}</p>
+                  <p className={getFontSizeClass('body')}>{project.description}</p>
                   <div className="flex flex-wrap gap-2">
                     {project.technologies.map((tech, techIndex) => (
                       <span key={techIndex} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -222,15 +267,15 @@ export function ResumePreview(): JSX.Element {
         {skills.length > 0 && (
           <>
             {renderDivider()}
-            <div className="space-y-4">
-              <h4 className="font-medium text-gray-900">Skills</h4>
+            <div className={getSpacingClass()}>
+              <h4 className={`font-medium text-gray-900 ${getFontSizeClass('subheading')}`}>Skills</h4>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {skills.map((skill, index) => (
                   <div key={skill.id} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-gray-800">{skill.name}</span>
+                      <span className={`font-medium text-gray-800 ${getFontSizeClass('body')}`}>{skill.name}</span>
                       {styling.showSkillProficiency && skill.proficiency !== undefined && (
-                        <span className="text-sm text-gray-600">{skill.proficiency}%</span>
+                        <span className={`text-gray-600 ${getFontSizeClass('body')}`}>{skill.proficiency}%</span>
                       )}
                     </div>
                     {styling.showSkillProficiency && skill.proficiency !== undefined && (
@@ -241,6 +286,57 @@ export function ResumePreview(): JSX.Element {
                         />
                       </div>
                     )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {languages.length > 0 && (
+          <>
+            {renderDivider()}
+            <div className={getSpacingClass()}>
+              <h4 className={`font-medium text-gray-900 ${getFontSizeClass('subheading')}`}>Languages</h4>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {languages.map((language) => (
+                  <div key={language.id} className="flex items-center justify-between">
+                    <span className={`font-medium text-gray-800 ${getFontSizeClass('body')}`}>{language.name}</span>
+                    <span className={`text-gray-600 ${getFontSizeClass('body')}`}>{language.proficiency}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {references.length > 0 && (
+          <>
+            {renderDivider()}
+            <div className={getSpacingClass()}>
+              <h4 className={`font-medium text-gray-900 ${getFontSizeClass('subheading')}`}>References</h4>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {references.map((reference) => (
+                  <div key={reference.id} className="space-y-2">
+                    <h5 className={`font-semibold text-gray-800 ${getFontSizeClass('subheading')}`}>{reference.name}</h5>
+                    <div className={`text-gray-600 ${getFontSizeClass('body')}`}>
+                      <p>{reference.relationship}</p>
+                      {styling.showLinks ? (
+                        <>
+                          <a href={`mailto:${reference.email}`} className="block transition-colors hover:text-blue-600">
+                            {reference.email}
+                          </a>
+                          <a href={`tel:${reference.phone}`} className="transition-colors hover:text-blue-600">
+                            {reference.phone}
+                          </a>
+                        </>
+                      ) : (
+                        <>
+                          <p>{reference.email}</p>
+                          <p>{reference.phone}</p>
+                        </>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

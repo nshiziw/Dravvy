@@ -7,6 +7,7 @@ export const contactSchema = z.object({
   location: z.string().min(1, 'Location is required'),
   website: z.string().url('Invalid URL').optional().or(z.literal('')),
   linkedin: z.string().url('Invalid URL').optional().or(z.literal('')),
+  github: z.string().url('Invalid URL').optional().or(z.literal('')),
 })
 
 export const experienceSchema = z.object({
@@ -15,7 +16,7 @@ export const experienceSchema = z.object({
   startDate: z.string().min(1, 'Start date is required'),
   endDate: z.string().min(1, 'End date is required'),
   current: z.boolean(),
-  description: z.array(z.string().min(1, 'Description is required')).min(1, 'At least one description point is required'),
+  description: z.array(z.string().min(1, 'Description is required')).min(2, 'At least two description points are required').max(4, 'Maximum four description points allowed'),
 })
 
 export const educationSchema = z.object({
@@ -46,18 +47,26 @@ export const certificationSchema = z.object({
   link: z.string().url('Invalid URL').optional().or(z.literal('')),
 })
 
-export const awardSchema = z.object({
-  title: z.string().min(1, 'Award title is required'),
-  issuer: z.string().min(1, 'Issuer is required'),
-  date: z.string().min(1, 'Date is required'),
-  description: z.string().min(1, 'Description is required'),
+export const languageSchema = z.object({
+  language: z.string().min(1, 'Language is required'),
+  proficiency: z.enum(['native', 'fluent', 'proficient', 'intermediate', 'beginner', 'basic']),
+})
+
+export const referenceSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  relationship: z.string().min(1, 'Relationship is required'),
+  email: z.string().email('Invalid email address'),
+  phone: z.string().min(1, 'Phone number is required'),
 })
 
 export const styleSchema = z.object({
   theme: z.enum(['modern', 'classic', 'minimal']),
-  fontSize: z.number().min(8).max(14),
-  spacing: z.number().min(1).max(2),
+  fontSize: z.enum(['small', 'medium', 'large']),
+  spacing: z.enum(['small', 'medium', 'large']),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+  font: z.enum(['times new roman', 'georgia', 'cambria', 'garamond', 'calibri', 'helvetica', 'arial', 'roboto', 'lato', 'open sans']),
+  separator: z.enum(['line', 'double line', 'bold line', 'no separator']),
+  dateFormat: z.enum(['MM/YYYY', 'MMM YYYY', 'MMMM YYYY']),
 })
 
 export const resumeSchema = z.object({
@@ -65,6 +74,9 @@ export const resumeSchema = z.object({
   summary: z.string().min(1, 'Summary is required'),
   experience: z.array(experienceSchema),
   education: z.array(educationSchema),
-  skills: z.array(skillSchema).min(3, 'At least three skills are required'),
+  skills: z.array(skillSchema).min(1, 'At least one skill is required'),
   projects: z.array(projectSchema).min(1, 'At least one project is required'),
+  certifications: z.array(certificationSchema).optional(),
+  languages: z.array(languageSchema).min(1, 'At least one language is required'),
+  references: z.array(referenceSchema).optional(),
 }) 

@@ -1,96 +1,58 @@
-'use client'
-
-import { useState } from 'react'
-import { ResumeForm } from '@/components/resume-form'
-import { ResumePreview } from '@/components/resume-preview'
-import { ProgressTracker } from '@/components/progress-tracker'
-import { Button } from '@/components/ui/button'
-import { useResumeStore } from '@/store/useResumeStore'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
-
-type Section = {
-  id: 'contact' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'awards' | 'styling' | 'preview' | 'export'
-  label: string
-}
-
-const sections: Section[] = [
-  { id: 'contact', label: 'Contact Information' },
-  { id: 'summary', label: 'Professional Summary' },
-  { id: 'experience', label: 'Work Experience' },
-  { id: 'education', label: 'Education' },
-  { id: 'skills', label: 'Skills' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'certifications', label: 'Certifications' },
-  { id: 'awards', label: 'Awards' },
-  { id: 'styling', label: 'Resume Styling' },
-  { id: 'preview', label: 'Resume Preview' },
-  { id: 'export', label: 'Export Resume' },
-]
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
-  const activeSection = useResumeStore((state) => state.activeSection)
-  const setActiveSection = useResumeStore((state) => state.setActiveSection)
-
-  const handleNext = () => {
-    if (activeSection < sections.length - 1) {
-      setActiveSection(activeSection + 1)
-    }
-  }
-
-  const handlePrevious = () => {
-    if (activeSection > 0) {
-      setActiveSection(activeSection - 1)
-    }
-  }
-
   return (
-    <div className="mx-auto px-[5%] py-8">
-      <header className="mb-8 text-center">
-        <h1 className="text-4xl font-bold text-gray-900">Dravvy</h1>
-        <p className="mt-2 text-lg text-gray-600">
-          Create your professional resume with ease
+    <main className="flex flex-col items-center justify-between min-h-screen p-24">
+      {/* Hero Section */}
+      <section className="w-full max-w-5xl mx-auto space-y-8 text-center">
+        <h1 className="text-6xl font-bold tracking-tight">
+          Create Your Professional Resume
+        </h1>
+        <p className="text-xl text-muted-foreground">
+          Build a beautiful, professional resume in minutes. No design skills needed.
         </p>
-      </header>
-
-      <div className="grid grid-cols-1 gap-8">
-        <div className="space-y-8">
-          <ProgressTracker />
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              {sections[activeSection].label}
-            </h2>
-            {sections[activeSection].id === 'preview' ? (
-              <ResumePreview />
-            ) : sections[activeSection].id === 'export' ? (
-              <ResumeForm section="export" />
-            ) : (
-              <ResumeForm section={sections[activeSection].id} />
-            )}
-            <div className="flex justify-between mt-6">
-              <Button
-                onClick={handlePrevious}
-                disabled={activeSection === 0}
-                variant="outline"
-                className="relative overflow-hidden group px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                <ChevronLeftIcon className="h-5 w-5 relative z-10" />
-                <span className="relative z-10">Previous</span>
-                <span className="absolute inset-0 w-0 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
-              </Button>
-              <Button
-                onClick={handleNext}
-                disabled={activeSection === sections.length - 1}
-                variant="outline"
-                className="relative overflow-hidden group px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                <span className="relative z-10">Next</span>
-                <ChevronRightIcon className="h-5 w-5 relative z-10" />
-                <span className="absolute inset-0 w-0 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
-              </Button>
-            </div>
-          </div>
+        <div className="flex justify-center gap-4">
+          <Link href="/create">
+            <Button size="lg" className="gap-2">
+              Get Started <ArrowRight className="w-4 h-4" />
+            </Button>
+          </Link>
         </div>
-      </div>
-    </div>
-  )
+      </section>
+
+      {/* Key Features */}
+      <section className="grid w-full max-w-5xl grid-cols-1 gap-8 mx-auto md:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle>Easy to Use</CardTitle>
+            <CardDescription>Simple step-by-step process</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>Create your resume in minutes with our intuitive interface.</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Professional Templates</CardTitle>
+            <CardDescription>Multiple styling options</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>Choose from various professional templates and customize to your liking.</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Export to PDF</CardTitle>
+            <CardDescription>Download and share</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>Export your resume as a PDF and share it with potential employers.</p>
+          </CardContent>
+        </Card>
+      </section>
+    </main>
+  );
 }

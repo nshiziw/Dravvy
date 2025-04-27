@@ -5,6 +5,7 @@ export type ContactInfo = {
   location: string
   website?: string
   linkedin?: string
+  github?: string
 }
 
 export type Experience = {
@@ -64,6 +65,20 @@ export type ResumeStyle = {
   color: string
 }
 
+export type Language = {
+  id: string
+  language: string
+  proficiency: 'native' | 'fluent' | 'proficient' | 'intermediate' | 'beginner' | 'basic'
+}
+
+export type Reference = {
+  id: string
+  name: string
+  relationship: string
+  email: string
+  phone: string
+}
+
 export type ResumeData = {
   contact: ContactInfo
   summary: string
@@ -73,5 +88,18 @@ export type ResumeData = {
   projects: Project[]
   certifications: Certification[]
   awards: Award[]
+  languages: Language[]
+  references: Reference[]
   style: ResumeStyle
+}
+
+export interface ResumeState {
+  languages: Language[]
+  references: Reference[]
+  addLanguage: (language: Omit<Language, 'id'>) => void
+  updateLanguage: (language: Language) => void
+  removeLanguage: (id: string) => void
+  addReference: (reference: Omit<Reference, 'id'>) => void
+  updateReference: (reference: Reference) => void
+  removeReference: (id: string) => void
 } 

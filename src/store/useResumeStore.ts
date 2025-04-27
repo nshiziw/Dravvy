@@ -11,6 +11,8 @@ import type {
   Certification,
   Award,
   ResumeStyle,
+  Language,
+  Reference,
 } from '@/types/resume';
 
 interface ResumeState extends ResumeData {
@@ -64,6 +66,15 @@ interface ResumeState extends ResumeData {
   
   // Reset
   resetStore: () => void;
+  
+  languages: Language[];
+  references: Reference[];
+  addLanguage: (language: Omit<Language, 'id'>) => void;
+  updateLanguage: (language: Language) => void;
+  removeLanguage: (id: string) => void;
+  addReference: (reference: Omit<Reference, 'id'>) => void;
+  updateReference: (reference: Reference) => void;
+  removeReference: (id: string) => void;
 }
 
 const initialState: Omit<ResumeState, keyof Omit<ResumeState, keyof ResumeData | 'activeSection'>> = {
@@ -87,6 +98,8 @@ const initialState: Omit<ResumeState, keyof Omit<ResumeState, keyof ResumeData |
     spacing: 1.15,
     color: '#2563eb',
   },
+  languages: [],
+  references: [],
 };
 
 export const useResumeStore = create<ResumeState>()(
@@ -240,6 +253,35 @@ export const useResumeStore = create<ResumeState>()(
       
       // Reset
       resetStore: () => set(initialState),
+      
+      addLanguage: (language) =>
+        set((state) => ({
+          languages: [...state.languages, { ...language, id: uuidv4() }],
+        })),
+      updateLanguage: (language) =>
+        set((state) => ({
+          languages: state.languages.map((l) =>
+            l.id === language.id ? language : l
+          ),
+        })),
+      removeLanguage: (id) =>
+        set((state) => ({
+          languages: state.languages.filter((l) => l.id !== id),
+        })),
+      addReference: (reference) =>
+        set((state) => ({
+          references: [...state.references, { ...reference, id: uuidv4() }],
+        })),
+      updateReference: (reference) =>
+        set((state) => ({
+          references: state.references.map((r) =>
+            r.id === reference.id ? reference : r
+          ),
+        })),
+      removeReference: (id) =>
+        set((state) => ({
+          references: state.references.filter((r) => r.id !== id),
+        })),
     }),
     {
       name: 'resume-store',

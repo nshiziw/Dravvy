@@ -2,14 +2,14 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 type Section =
-  | 'contact'
-  | 'summary'
-  | 'experience'
+  | 'basic'
+  | 'work'
   | 'education'
   | 'skills'
-  | 'projects'
   | 'certifications'
-  | 'awards'
+  | 'projects'
+  | 'languages'
+  | 'references'
   | 'styling'
   | 'preview'
   | 'export'
@@ -40,14 +40,14 @@ export const useUIStore = create<UIState>()(
 )
 
 export const sections: { id: Section; label: string }[] = [
-  { id: 'contact', label: 'Contact Information' },
-  { id: 'summary', label: 'Professional Summary' },
-  { id: 'experience', label: 'Work Experience' },
+  { id: 'basic', label: 'Basic Information' },
+  { id: 'work', label: 'Work Experience' },
   { id: 'education', label: 'Education' },
   { id: 'skills', label: 'Skills' },
-  { id: 'projects', label: 'Projects' },
   { id: 'certifications', label: 'Certifications' },
-  { id: 'awards', label: 'Awards' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'languages', label: 'Languages' },
+  { id: 'references', label: 'References' },
   { id: 'styling', label: 'Resume Styling' },
   { id: 'preview', label: 'Resume Preview' },
   { id: 'export', label: 'Export Resume' },

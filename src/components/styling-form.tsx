@@ -6,7 +6,6 @@ import { useResumeStore } from "@/store/useResumeStore"
 import type { ResumeData } from '@/types/resume'
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import {
   Select,
   SelectContent,
@@ -15,61 +14,56 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import { toast } from "sonner"
 
 const serifFonts = [
-  { name: "Times New Roman", value: "Times New Roman" },
-  { name: "Georgia", value: "Georgia" },
-  { name: "Cambria", value: "Cambria" },
-  { name: "Garamond", value: "Garamond" },
+  { value: "times new roman", label: "Times New Roman" },
+  { value: "georgia", label: "Georgia" },
+  { value: "cambria", label: "Cambria" },
+  { value: "garamond", label: "Garamond" },
 ] as const
 
 const sansSerifFonts = [
-  { name: "Calibri", value: "Calibri" },
-  { name: "Helvetica", value: "Helvetica" },
-  { name: "Arial", value: "Arial" },
-  { name: "Roboto", value: "Roboto" },
-  { name: "Lato", value: "Lato" },
-  { name: "Open Sans", value: "Open Sans" },
+  { value: "calibri", label: "Calibri" },
+  { value: "helvetica", label: "Helvetica" },
+  { value: "arial", label: "Arial" },
+  { value: "roboto", label: "Roboto" },
+  { value: "lato", label: "Lato" },
+  { value: "open sans", label: "Open Sans" },
+] as const
+
+const separatorTypes = [
+  { value: "line", label: "Line" },
+  { value: "double line", label: "Double Line" },
+  { value: "bold line", label: "Bold Line" },
+  { value: "no separator", label: "No Separator" },
 ] as const
 
 const dateFormats = [
-  { label: "MM/DD/YYYY", value: "MM/DD/YYYY" },
-  { label: "DD/MM/YYYY", value: "DD/MM/YYYY" },
-  { label: "Month DD, YYYY", value: "Month DD, YYYY" },
-  { label: "DD Month YYYY", value: "DD Month YYYY" },
+  { value: "MM/YYYY", label: "MM/YYYY" },
+  { value: "MMM YYYY", label: "MMM YYYY" },
+  { value: "MMMM YYYY", label: "MMMM YYYY" },
 ] as const
 
-const dividerTypes = [
-  { label: "None", value: "none" },
-  { label: "Line", value: "line" },
-  { label: "Double Line", value: "double-line" },
-  { label: "Dashes", value: "dashes" },
+const fontSizes = [
+  { value: "small", label: "Small" },
+  { value: "medium", label: "Medium" },
+  { value: "large", label: "Large" },
+] as const
+
+const spacings = [
+  { value: "small", label: "Small" },
+  { value: "medium", label: "Medium" },
+  { value: "large", label: "Large" },
 ] as const
 
 export function StylingForm(): JSX.Element {
-  const [previewText, setPreviewText] = React.useState(
-    "The quick brown fox jumps over the lazy dog"
-  )
-  const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [submitSuccess, setSubmitSuccess] = React.useState(false)
-
   const style = useResumeStore((state: { style: ResumeData['style'] }) => state.style)
   const updateStyle = useResumeStore((state: { updateStyle: (style: ResumeData['style']) => void }) => state.updateStyle)
 
   const handleSaveStyles = () => {
-    setIsSubmitting(true)
-    // The styles are already being saved in real-time, but we'll add a success message
-    setSubmitSuccess(true)
-    setIsSubmitting(false)
-    setTimeout(() => setSubmitSuccess(false), 3000)
-  }
-
-  const handleStyleUpdate = (update: Partial<ResumeData['style']>) => {
-    if (update.theme && !['modern', 'classic', 'minimal'].includes(update.theme)) {
-      console.error('Invalid theme selected')
-      return
-    }
-    updateStyle({ ...style, ...update })
+    updateStyle(style)
+    toast.success('Styles saved successfully!')
   }
 
   return (
@@ -80,7 +74,7 @@ export function StylingForm(): JSX.Element {
           <Label>Theme</Label>
           <Select
             value={style.theme}
-            onValueChange={(value: ResumeData['style']['theme']) => handleStyleUpdate({ theme: value })}
+            onValueChange={(value) => updateStyle({ ...style, theme: value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select a theme" />
@@ -93,55 +87,134 @@ export function StylingForm(): JSX.Element {
           </Select>
         </div>
 
+        {/* Font Selection */}
+        <div className="space-y-2">
+          <Label>Font</Label>
+          <Select
+            value={style.font}
+            onValueChange={(value) => updateStyle({ ...style, font: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a font" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="" disabled>
+                Serif Fonts
+              </SelectItem>
+              {serifFonts.map((font) => (
+                <SelectItem key={font.value} value={font.value}>
+                  {font.label}
+                </SelectItem>
+              ))}
+              <SelectItem value="" disabled>
+                Sans-Serif Fonts
+              </SelectItem>
+              {sansSerifFonts.map((font) => (
+                <SelectItem key={font.value} value={font.value}>
+                  {font.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Font Size */}
         <div className="space-y-2">
           <Label>Font Size</Label>
-          <Input
-            type="number"
+          <Select
             value={style.fontSize}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleStyleUpdate({ fontSize: Number(e.target.value) })}
-            min={8}
-            max={16}
-            step={0.5}
-          />
+            onValueChange={(value) => updateStyle({ ...style, fontSize: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select font size" />
+            </SelectTrigger>
+            <SelectContent>
+              {fontSizes.map((size) => (
+                <SelectItem key={size.value} value={size.value}>
+                  {size.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Line Spacing */}
+        {/* Spacing */}
         <div className="space-y-2">
-          <Label>Line Spacing</Label>
-          <Input
-            type="number"
+          <Label>Spacing</Label>
+          <Select
             value={style.spacing}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleStyleUpdate({ spacing: Number(e.target.value) })}
-            min={1}
-            max={2}
-            step={0.05}
-          />
+            onValueChange={(value) => updateStyle({ ...style, spacing: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select spacing" />
+            </SelectTrigger>
+            <SelectContent>
+              {spacings.map((spacing) => (
+                <SelectItem key={spacing.value} value={spacing.value}>
+                  {spacing.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Color */}
+        {/* Section Separator */}
+        <div className="space-y-2">
+          <Label>Section Separator</Label>
+          <Select
+            value={style.separator}
+            onValueChange={(value) => updateStyle({ ...style, separator: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select separator style" />
+            </SelectTrigger>
+            <SelectContent>
+              {separatorTypes.map((separator) => (
+                <SelectItem key={separator.value} value={separator.value}>
+                  {separator.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Date Format */}
+        <div className="space-y-2">
+          <Label>Date Format</Label>
+          <Select
+            value={style.dateFormat}
+            onValueChange={(value) => updateStyle({ ...style, dateFormat: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select date format" />
+            </SelectTrigger>
+            <SelectContent>
+              {dateFormats.map((format) => (
+                <SelectItem key={format.value} value={format.value}>
+                  {format.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Accent Color */}
         <div className="space-y-2">
           <Label>Accent Color</Label>
           <Input
             type="color"
             value={style.color}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleStyleUpdate({ color: e.target.value })}
+            onChange={(e) => updateStyle({ ...style, color: e.target.value })}
+            className="h-10 px-3 w-full"
           />
         </div>
       </div>
 
-      {submitSuccess && (
-        <div className="p-4 text-sm text-green-700 bg-green-100 rounded-lg">
-          Styles saved successfully!
-        </div>
-      )}
-
       <Button
         onClick={handleSaveStyles}
-        disabled={isSubmitting}
         className="w-full"
       >
-        {isSubmitting ? 'Saving...' : 'Save Styles'}
+        Save Styles
       </Button>
     </div>
   )

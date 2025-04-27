@@ -1,6 +1,7 @@
 'use client'
 
 import { useResumeStore } from '@/store/useResumeStore'
+import { useUIStore } from '@/store/useUIStore'
 import { calculateProgress, getProgressMessage } from '@/lib/utils/progress'
 import { Progress } from '@/components/ui/progress'
 import { Check } from 'lucide-react'
@@ -9,30 +10,29 @@ import { motion } from 'framer-motion'
 import type { ResumeData } from '@/types/resume'
 
 const sections = [
-  { id: 'contact', label: 'Contact Information' },
-  { id: 'summary', label: 'Professional Summary' },
-  { id: 'experience', label: 'Work Experience' },
+  { id: 'basic', label: 'Basic Information' },
+  { id: 'work', label: 'Work Experience' },
   { id: 'education', label: 'Education' },
   { id: 'skills', label: 'Skills' },
-  { id: 'projects', label: 'Projects' },
   { id: 'certifications', label: 'Certifications' },
-  { id: 'awards', label: 'Awards' },
-  { id: 'styling', label: 'Resume Styling' },
-  { id: 'preview', label: 'Resume Preview' },
-  { id: 'export', label: 'Export Resume' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'languages', label: 'Languages' },
+  { id: 'references', label: 'References' }
 ]
 
 export function ProgressTracker() {
   const contact = useResumeStore((state: { contact: ResumeData['contact'] }) => state.contact)
-  const summary = useResumeStore((state: { summary: ResumeData['summary'] }) => state.summary)
+  const summary = useResumeStore((state: { summary: string }) => state.summary)
   const experience = useResumeStore((state: { experience: ResumeData['experience'] }) => state.experience)
   const education = useResumeStore((state: { education: ResumeData['education'] }) => state.education)
   const skills = useResumeStore((state: { skills: ResumeData['skills'] }) => state.skills)
   const projects = useResumeStore((state: { projects: ResumeData['projects'] }) => state.projects)
   const certifications = useResumeStore((state: { certifications: ResumeData['certifications'] }) => state.certifications)
-  const awards = useResumeStore((state: { awards: ResumeData['awards'] }) => state.awards)
-  const activeSection = useResumeStore((state: { activeSection: number }) => state.activeSection)
-  const setActiveSection = useResumeStore((state: { setActiveSection: (section: number) => void }) => state.setActiveSection)
+  const languages = useResumeStore((state: { languages: ResumeData['languages'] }) => state.languages)
+  const references = useResumeStore((state: { references: ResumeData['references'] }) => state.references)
+  
+  const activeSection = useUIStore((state) => state.activeSection)
+  const setActiveSection = useUIStore((state) => state.setActiveSection)
 
   const resumeData = {
     contact,
@@ -42,7 +42,8 @@ export function ProgressTracker() {
     skills,
     projects,
     certifications,
-    awards
+    languages,
+    references
   }
 
   const progress = calculateProgress(resumeData)
@@ -58,11 +59,9 @@ export function ProgressTracker() {
 
   const isSectionCompleted = (sectionId: string) => {
     switch (sectionId) {
-      case 'contact':
-        return !!contact?.name;
-      case 'summary':
-        return !!summary;
-      case 'experience':
+      case 'basic':
+        return !!contact?.fullName && !!contact?.email && !!contact?.phone && !!contact?.location;
+      case 'work':
         return (experience?.length || 0) > 0;
       case 'education':
         return (education?.length || 0) > 0;
@@ -72,12 +71,10 @@ export function ProgressTracker() {
         return (projects?.length || 0) > 0;
       case 'certifications':
         return (certifications?.length || 0) > 0;
-      case 'awards':
-        return (awards?.length || 0) > 0;
-      case 'styling':
-      case 'preview':
-      case 'export':
-        return true; // Mark these as always completed
+      case 'languages':
+        return (languages?.length || 0) > 0;
+      case 'references':
+        return (references?.length || 0) > 0;
       default:
         return false;
     }
