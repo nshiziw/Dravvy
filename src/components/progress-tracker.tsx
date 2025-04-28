@@ -8,6 +8,7 @@ import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import type { ResumeData } from '@/types/resume'
+import React from 'react'
 
 const sections = [
   { id: 'basic', label: 'Basic Information' },
@@ -33,6 +34,7 @@ export function ProgressTracker() {
   
   const activeSection = useUIStore((state) => state.activeSection)
   const setActiveSection = useUIStore((state) => state.setActiveSection)
+  const [savedSections, setSavedSections] = React.useState<Set<string>>(new Set())
 
   const resumeData = {
     contact,
@@ -58,6 +60,8 @@ export function ProgressTracker() {
   }
 
   const isSectionCompleted = (sectionId: string) => {
+    if (!savedSections.has(sectionId)) return false;
+    
     switch (sectionId) {
       case 'basic':
         return !!contact?.fullName && !!contact?.email && !!contact?.phone && !!contact?.location;

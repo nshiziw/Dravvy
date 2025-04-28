@@ -36,6 +36,9 @@ function MainResumeForm({ section }: ResumeFormProps) {
   const setActiveSection = useUIStore((state) => state.setActiveSection)
   const activeSection = useUIStore((state) => state.activeSection)
   const router = useRouter()
+  const [savedSections, setSavedSections] = React.useState<Set<string>>(new Set())
+  const [referenceOption, setReferenceOption] = React.useState<'uponRequest' | 'include'>('uponRequest')
+  const [references, setReferences] = React.useState<Reference[]>([])
 
   const [experiences, setExperiences] = React.useState<Experience[]>([])
   const [newDescription, setNewDescription] = React.useState('')
@@ -51,8 +54,6 @@ function MainResumeForm({ section }: ResumeFormProps) {
   const [certifications, setCertifications] = React.useState<Certification[]>([])
 
   const [languages, setLanguages] = React.useState<Language[]>([])
-
-  const [references, setReferences] = React.useState<Reference[]>([])
 
   const contact = useResumeStore((state: { contact: ResumeData['contact'] }) => state.contact)
   const summary = useResumeStore((state: { summary: string }) => state.summary)
@@ -86,6 +87,10 @@ function MainResumeForm({ section }: ResumeFormProps) {
   const storeAddReference = useResumeStore((state: { addReference: (reference: Omit<Reference, 'id'>) => void }) => state.addReference)
   const storeUpdateReference = useResumeStore((state: { updateReference: (reference: Reference) => void }) => state.updateReference)
   const storeRemoveReference = useResumeStore((state: { removeReference: (id: string) => void }) => state.removeReference)
+
+  const markSectionAsSaved = () => {
+    setSavedSections(prev => new Set([...prev, section]))
+  }
 
   const handleAddExperience = () => {
     const newExperience = {
@@ -255,16 +260,6 @@ function MainResumeForm({ section }: ResumeFormProps) {
     setTimeout(() => setSubmitSuccess(false), 3000)
   }
 
-  const addReference = () => {
-    setReferences([...references, {
-      id: crypto.randomUUID(),
-      name: '',
-      relationship: '',
-      email: '',
-      phone: ''
-    }])
-  }
-
   const handleReferenceChange = (index: number, field: keyof Reference, value: string) => {
     const updatedReferences = [...references]
     updatedReferences[index] = {
@@ -272,6 +267,17 @@ function MainResumeForm({ section }: ResumeFormProps) {
       [field]: value
     }
     setReferences(updatedReferences)
+  }
+
+  const addReference = () => {
+    const newReference: Reference = {
+      id: crypto.randomUUID(),
+      name: '',
+      relationship: '',
+      email: '',
+      phone: ''
+    }
+    setReferences([...references, newReference])
   }
 
   const handleReferenceSubmit = (e: React.FormEvent) => {
@@ -359,11 +365,9 @@ function MainResumeForm({ section }: ResumeFormProps) {
           router.push('/settings')
           break
       }
+      markSectionAsSaved()
       toast.success(`${section.charAt(0).toUpperCase() + section.slice(1)} saved successfully`)
       setSubmitSuccess(true)
-      if (section !== 'references') {
-        setActiveSection(activeSection + 1)
-      }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred')
       toast.error(error instanceof Error ? error.message : 'Failed to save changes')
@@ -483,6 +487,15 @@ function MainResumeForm({ section }: ResumeFormProps) {
               rows={4}
               required
             />
+          </div>
+          <div className="flex justify-end mt-6">
+            <Button
+              type="submit"
+              className={buttonStyles}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
           </div>
         </div>
       )}
@@ -618,6 +631,15 @@ function MainResumeForm({ section }: ResumeFormProps) {
           >
             Add Experience
           </Button>
+          <div className="flex justify-end mt-6">
+            <Button
+              type="submit"
+              className={buttonStyles}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
         </div>
       )}
 
@@ -720,6 +742,15 @@ function MainResumeForm({ section }: ResumeFormProps) {
           >
             Add Education
           </Button>
+          <div className="flex justify-end mt-6">
+            <Button
+              type="submit"
+              className={buttonStyles}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
         </div>
       )}
 
@@ -801,6 +832,15 @@ function MainResumeForm({ section }: ResumeFormProps) {
           >
             Add Category
           </Button>
+          <div className="flex justify-end mt-6">
+            <Button
+              type="submit"
+              className={buttonStyles}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
         </div>
       )}
 
@@ -877,6 +917,15 @@ function MainResumeForm({ section }: ResumeFormProps) {
           >
             Add Certification
           </Button>
+          <div className="flex justify-end mt-6">
+            <Button
+              type="submit"
+              className={buttonStyles}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
         </div>
       )}
 
@@ -1020,6 +1069,15 @@ function MainResumeForm({ section }: ResumeFormProps) {
           >
             Add Project
           </Button>
+          <div className="flex justify-end mt-6">
+            <Button
+              type="submit"
+              className={buttonStyles}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
         </div>
       )}
 
@@ -1079,6 +1137,15 @@ function MainResumeForm({ section }: ResumeFormProps) {
           >
             Add Language
           </Button>
+          <div className="flex justify-end mt-6">
+            <Button
+              type="submit"
+              className={buttonStyles}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
         </div>
       )}
 
@@ -1117,7 +1184,7 @@ function MainResumeForm({ section }: ResumeFormProps) {
           </div>
 
           {referenceOption === 'include' && (
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-6">
               <h2 className="text-2xl font-semibold">References</h2>
               {references.map((reference, index) => (
                 <Card key={reference.id} className="p-4">
@@ -1171,7 +1238,10 @@ function MainResumeForm({ section }: ResumeFormProps) {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => storeRemoveReference(reference.id)}
+                    onClick={() => {
+                      const updatedReferences = references.filter((_, i) => i !== index)
+                      setReferences(updatedReferences)
+                    }}
                     className="mt-4"
                   >
                     Remove Reference
@@ -1180,19 +1250,18 @@ function MainResumeForm({ section }: ResumeFormProps) {
               ))}
               <Button
                 type="button"
-                onClick={() => addReference()}
+                onClick={addReference}
                 className="w-full"
               >
                 Add Reference
               </Button>
-            </form>
+            </div>
           )}
 
           <div className="flex justify-end">
             <Button
               type="submit"
               className={buttonStyles}
-              onClick={handleSubmit}
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Saving...' : 'Save Changes'}
@@ -1367,7 +1436,7 @@ function ReferenceFormComponent({ onReferencesSaved }: { onReferencesSaved?: () 
                   <Input
                     id={`name-${index}`}
                     value={reference.name}
-                    onChange={(e) => updateReference({ ...reference, name: e.target.value })}
+                    onChange={(e) => handleReferenceChange(index, 'name', e.target.value)}
                     className={inputStyles}
                     placeholder="Jane Smith"
                     required
@@ -1378,7 +1447,7 @@ function ReferenceFormComponent({ onReferencesSaved }: { onReferencesSaved?: () 
                   <Input
                     id={`relationship-${index}`}
                     value={reference.relationship}
-                    onChange={(e) => updateReference({ ...reference, relationship: e.target.value })}
+                    onChange={(e) => handleReferenceChange(index, 'relationship', e.target.value)}
                     className={inputStyles}
                     placeholder="Former Manager"
                     required
@@ -1390,7 +1459,7 @@ function ReferenceFormComponent({ onReferencesSaved }: { onReferencesSaved?: () 
                     id={`email-${index}`}
                     type="email"
                     value={reference.email}
-                    onChange={(e) => updateReference({ ...reference, email: e.target.value })}
+                    onChange={(e) => handleReferenceChange(index, 'email', e.target.value)}
                     className={inputStyles}
                     placeholder="jane.smith@example.com"
                     required
@@ -1401,7 +1470,7 @@ function ReferenceFormComponent({ onReferencesSaved }: { onReferencesSaved?: () 
                   <Input
                     id={`phone-${index}`}
                     value={reference.phone}
-                    onChange={(e) => updateReference({ ...reference, phone: e.target.value })}
+                    onChange={(e) => handleReferenceChange(index, 'phone', e.target.value)}
                     className={inputStyles}
                     placeholder="+1 (555) 123-4567"
                     required
@@ -1420,7 +1489,7 @@ function ReferenceFormComponent({ onReferencesSaved }: { onReferencesSaved?: () 
           ))}
           <Button
             type="button"
-            onClick={() => addReference({ name: '', relationship: '', email: '', phone: '' })}
+            onClick={() => addReference()}
             className="w-full"
           >
             Add Reference
@@ -1438,7 +1507,6 @@ function ReferenceFormComponent({ onReferencesSaved }: { onReferencesSaved?: () 
         <Button
           type="submit"
           className={buttonStyles}
-          onClick={handleSubmit}
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Saving...' : 'Save Changes'}
