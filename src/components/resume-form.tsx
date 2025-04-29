@@ -1276,11 +1276,6 @@ function MainResumeForm({ section }: ResumeFormProps) {
         </div>
       )}
 
-      {submitSuccess && (
-        <div className="text-sm text-green-500">
-          Data saved successfully
-        </div>
-      )}
     </form>
   )
 }

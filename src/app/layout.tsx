@@ -51,11 +51,11 @@ export default function RootLayout({
             {children}
           </main>
           <Toaster
-            position="bottom-right"
+            position="top-right"
             toastOptions={{
               style: {
                 background: 'white',
-                color: 'black',
+                color: 'teal',
               },
             }}
           />

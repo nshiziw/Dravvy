@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { useUIStore } from '@/store/useUIStore'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
-import { Toaster } from 'sonner'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 import { useResumeStore } from '@/store/useResumeStore'
@@ -52,8 +51,6 @@ export default function CreatePage() {
 
   return (
     <div className="mx-auto px-[5%] py-8">
-      <Toaster position="top-right" />
-      
       <header className="mb-8 text-center">
         <h1 className="text-4xl font-bold text-gray-900">Create Your Resume</h1>
         <p className="mt-2 text-lg text-gray-600">
